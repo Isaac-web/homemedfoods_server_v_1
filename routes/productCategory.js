@@ -9,10 +9,10 @@ const {
 } = require("../controllers/productCategory");
 
 const router = express.Router();
-router.post("/categories", createProductCategory);
-router.get("/categories", getAllCategories);
-router.get("/categories/:id", [validateId], getCategory);
-router.patch("/categories/:id", [validateId], updateCategory);
-router.delete("/categories/:id", [validateId], deleteCategory);
+router.post("/", createProductCategory);
+router.get("/", getAllCategories);
+router.get("/:id", [validateId], getCategory);
+router.patch("/:id", [validateId], updateCategory);
+router.delete("/:id", [validateId], deleteCategory);
 
 module.exports = router;

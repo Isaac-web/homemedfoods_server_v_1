@@ -9,11 +9,13 @@ const ProductCategory = mongoose.model(
         type: String,
         minlength: 2,
         maxlength: 256,
+        trim: true,
         required: true,
       },
       desc: {
         type: String,
         maxlength: 1025,
+        trim: true,
       },
     },
     { timestamps: true }
