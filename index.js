@@ -1,4 +1,5 @@
 const express = require("express");
+const config = require("config");
 const mongoose = require("mongoose");
 
 const productCategory = require("./routes/productCategory");
@@ -12,9 +13,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api", productCategory);
 
-const port = process.env.PORT || 9000;
+const port = process.env.PORT || config.get("port");
 mongoose
-  .connect("mongodb://localhost/home_med_dev")
+  .connect(config.get("db"))
   .then(() => {
     app.listen(port, () => console.info(`Listening on port ${port}...`));
   })
