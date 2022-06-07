@@ -28,8 +28,8 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   discount: {
-    type: String,
-    default: "",
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Discount",
   },
 });
 
@@ -41,7 +41,7 @@ const validate = (product) => {
     desc: Joi.string().max(1024),
     categoryId: Joi.objectId().required(),
     price: Joi.number().min(0).max(1000).required(),
-    discountId: Joi.string(),
+    discountId: Joi.objectId(),
   });
 
   return schema.validate(product);
@@ -53,11 +53,12 @@ const validateOnUpdate = (product) => {
     desc: Joi.string().max(1024),
     categoryId: Joi.objectId(),
     price: Joi.number().min(0).max(1000),
-    discountId: Joi.string(),
+    discountId: Joi.objectId(),
   });
 
   return schema.validate(product);
 };
 
 exports.validate = validate;
+exports.validateOnUpdate = validateOnUpdate;
 exports.Product = Product;

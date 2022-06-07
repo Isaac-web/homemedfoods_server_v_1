@@ -1,6 +1,7 @@
 const _ = require("lodash");
-const { Product, validate } = require("../models/Product");
+const { Product, validate, validateOnUpdate } = require("../models/Product");
 const { ProductCategory } = require("../models/ProductCategory");
+const { Discount } = require("../models/Discount");
 const validateObjectId = require("../utils/validateObjectId");
 
 const createProduct = async (req, res) => {
@@ -27,10 +28,9 @@ const getProducts = async (req, res) => {
 };
 
 const getProduct = async (req, res) => {
-  const product = await Product.findById(req.params.id).populate(
-    "category",
-    "name desc"
-  );
+  const product = await Product.findById(req.params.id)
+    .populate("category", "name desc")
+    .populate("discount", "name discountPercent");
 
   if (!product) return res.status(404).send("Product not found.");
 
@@ -38,7 +38,12 @@ const getProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const { error } = validateOnUpdate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const product = await Product.findById(req.params.id)
+    .populate("category", "name desc")
+    .populate("discount", "name desc discountPercent");
   if (!product) return res.status(404).send("Product not found.");
 
   const { categoryId, discountId } = req.body;
@@ -57,9 +62,12 @@ const updateProduct = async (req, res) => {
 
   //discount update
   if (discountId) {
-    //Todo: validate discount object
+    if (!validateObjectId(discountId))
+      return res.status(400).send("Invalid discount Id.");
 
-    product.discount = discountId;
+    const discount = await Discount.findById(discountId);
+
+    product.discount = discount;
   }
 
   await product.save();
