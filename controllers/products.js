@@ -87,13 +87,13 @@ const updateProduct = async (req, res) => {
       return res.status(400).send("Invalid discount Id.");
 
     const discount = await Discount.findById(discountId);
+    if (!discount) return res.status(404).send("Discount not found.");
 
     product.discount = discount;
   }
 
   //update inventory
   if (quantity) {
-    console.log(product.inventory._id.toHexString(), quantity);
     product.inventory = await ProductInventory.findByIdAndUpdate(
       product.inventory._id,
       {

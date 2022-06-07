@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const { Discount, validate, validateOnUpdate } = require("../models/Discount");
+const { Product } = require("../models/Product");
 
 const createDiscount = async (req, res) => {
   const { error } = validate(req.body);
@@ -46,7 +47,15 @@ const updateDiscount = async (req, res) => {
 };
 
 const deleteDiscount = async (req, res) => {
-  const discount = await Discount.findByIdAndRemove(req.params.id);
+  let products = Product.updateMany(
+    { category: req.params.id },
+    { $unset: { discount: null } },
+    { new: true }
+  );
+
+  let discount = Discount.findByIdAndRemove(req.params.id);
+
+  [products, discount] = await Promise.all([products, discount]);
 
   if (!discount) return res.status(404).send("Discount not found.");
 

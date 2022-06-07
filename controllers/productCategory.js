@@ -4,6 +4,7 @@ const {
   validate,
   validateOnUpdate,
 } = require("../models/ProductCategory");
+const { Product } = require("../models/Product");
 
 const createProductCategory = async (req, res) => {
   const { error } = validate(req.body);
@@ -46,6 +47,12 @@ const updateCategory = async (req, res) => {
 };
 
 const deleteCategory = async (req, res) => {
+  const product = await Product.findOne({ category: req.params.id });
+  if (product)
+    return res
+      .status(400)
+      .send("Category has some products. Cannot be deleted.");
+
   const category = await ProductCategory.findByIdAndRemove(req.params.id);
   if (!category) return res.status(404).send("Category not found.");
 
