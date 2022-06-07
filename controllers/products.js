@@ -39,8 +39,9 @@ const createProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
   const products = await Product.find()
-    .populate("category", "name")
-    .populate("inventory");
+    .populate("category", "name desc")
+    .populate("inventory")
+    .populate("discount");
 
   res.send(products);
 };
@@ -48,7 +49,8 @@ const getProducts = async (req, res) => {
 const getProduct = async (req, res) => {
   const product = await Product.findById(req.params.id)
     .populate("category", "name desc")
-    .populate("discount", "name discountPercent");
+    .populate("discount", "name discountPercent")
+    .populate("inventory", "-createdAt");
 
   if (!product) return res.status(404).send("Product not found.");
 
@@ -61,10 +63,11 @@ const updateProduct = async (req, res) => {
 
   const product = await Product.findById(req.params.id)
     .populate("category", "name desc")
-    .populate("discount", "name desc discountPercent");
+    .populate("discount", "name desc discountPercent")
+    .populate("inventory");
   if (!product) return res.status(404).send("Product not found.");
 
-  const { categoryId, discountId } = req.body;
+  const { categoryId, discountId, quantity } = req.body;
   product.set(_.pick(req.body, ["name", "desc", "price"]));
 
   //category update
@@ -88,12 +91,26 @@ const updateProduct = async (req, res) => {
     product.discount = discount;
   }
 
+  //update inventory
+  if (quantity) {
+    console.log(product.inventory._id.toHexString(), quantity);
+    product.inventory = await ProductInventory.findByIdAndUpdate(
+      product.inventory._id,
+      {
+        $set: { quantity },
+      },
+      { new: true }
+    );
+  }
+
   await product.save();
   res.send(product);
 };
 
 const deleteProduct = async (req, res) => {
-  const product = await Product.findByIdAndRemove(req.params.id);
+  let product = await Product.findByIdAndRemove(req.params.id);
+  await ProductInventory.findByIdAndRemove(product.inventory);
+
   if (!product) return res.status(404).send("Product not found.");
 
   res.send(product);
