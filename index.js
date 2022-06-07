@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 const productCategory = require("./routes/productCategory");
 const products = require("./routes/products");
+const discounts = require("./routes/discounts");
 
 const app = express();
 app.get("/ping", (req, res) => {
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/categories", productCategory);
 app.use("/api/products", products);
+app.use("/api/discounts", discounts);
 
 const port = process.env.PORT || config.get("port");
 mongoose
