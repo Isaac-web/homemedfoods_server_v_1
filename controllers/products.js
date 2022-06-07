@@ -3,26 +3,44 @@ const { Product, validate, validateOnUpdate } = require("../models/Product");
 const { ProductCategory } = require("../models/ProductCategory");
 const { Discount } = require("../models/Discount");
 const validateObjectId = require("../utils/validateObjectId");
+const { ProductInventory } = require("../models/ProductInventory");
 
 const createProduct = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const product = new Product({
+  //create inventory
+  let inventory = new ProductInventory({ quantity: req.body.quantity });
+
+  //create product
+  let product = new Product({
     name: req.body.name,
     desc: req.body.desc,
     category: req.body.categoryId,
     price: req.body.price,
+    inventory: inventory._id,
     discount: req.body.discountId,
   });
 
-  await product.save();
+  let category = ProductCategory.findById(req.body.categoryId);
+  inventory = inventory.save();
+  product = product.save();
 
+  [inventory, product, category] = await Promise.all([
+    inventory,
+    product,
+    category,
+  ]);
+
+  product.inventory = inventory;
+  product.category = category;
   res.send(product);
 };
 
 const getProducts = async (req, res) => {
-  const products = await Product.find().populate("category", "name");
+  const products = await Product.find()
+    .populate("category", "name")
+    .populate("inventory");
 
   res.send(products);
 };

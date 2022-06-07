@@ -27,6 +27,10 @@ const productSchema = new mongoose.Schema({
     max: 1000,
     required: true,
   },
+  inventory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ProductInventory",
+  },
   discount: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Discount",
@@ -41,6 +45,7 @@ const validate = (product) => {
     desc: Joi.string().max(1024),
     categoryId: Joi.objectId().required(),
     price: Joi.number().min(0).max(1000).required(),
+    quantity: Joi.number().min(0).max(10000),
     discountId: Joi.objectId(),
   });
 
@@ -53,6 +58,7 @@ const validateOnUpdate = (product) => {
     desc: Joi.string().max(1024),
     categoryId: Joi.objectId(),
     price: Joi.number().min(0).max(1000),
+    quantity: Joi.number().min(0).max(10000),
     discountId: Joi.objectId(),
   });
 
