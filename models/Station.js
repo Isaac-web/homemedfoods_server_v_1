@@ -1,5 +1,5 @@
 const Joi = require("joi");
-Joi.objectId = require("joi-objectid");
+Joi.objectId = require("joi-objectid")(Joi);
 const mongoose = require("mongoose");
 
 const stationSchema = new mongoose.Schema({
@@ -35,7 +35,7 @@ const validate = (station) => {
     desc: Joi.string().max(2014),
     lat: Joi.number(),
     long: Joi.number(),
-    cityId: Joi.ObjectId().required(),
+    cityId: Joi.objectId().required(),
   });
 
   return schema.validate(station);

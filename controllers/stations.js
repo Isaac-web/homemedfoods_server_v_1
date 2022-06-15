@@ -1,17 +1,19 @@
 const { Station, validate, validateOnUpdate } = require("../models/Station");
 const { City } = require("../models/City");
+const _  = require("lodash")
+
 
 const createStation = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const city = City.findById(req.body.cityId);
+  const city = await City.findById(req.body.cityId);
   if (!city) return res.status(400).send("City not found.");
 
   const station = new Station({
     name: req.body.name,
     desc: req.body.desc,
-    city: city._id,
+    city: req.body.cityId,
     coordinates: {
       long: req.body.long,
       lat: req.body.lat,
@@ -22,7 +24,7 @@ const createStation = async (req, res) => {
 
   station.city = city;
 
-  res.send(city);
+  res.send(station);
 };
 
 const getStations = async (req, res) => {
@@ -32,9 +34,9 @@ const getStations = async (req, res) => {
 };
 
 const getStation = async (req, res) => {
-  const station = await Station.findBydId(req.params.id);
+  const station = await Station.findById(req.params.id);
 
-  if (station) return res.status(404).send("Station not found.");
+  if (!station) return res.status(404).send("Station not found.");
 
   res.send(station);
 };
@@ -46,6 +48,9 @@ const updateStation = async (req, res) => {
   const station = await Station.findById(req.params.id);
   if (!station) return res.status(404).send("Station not found.");
 
+  //perform updates
+
+  if(req.body.name) station.name = req.body.name;
   if (req.body.cityId) {
     const city = await City.findById(req.body.cityId);
     if (!city) return res.status(404).send("City not found.");
@@ -55,13 +60,13 @@ const updateStation = async (req, res) => {
   for (let field in req.body) station.coordinates[field] = req.body[field];
   await station.save();
 
-  res.send(city);
+  res.send(station);
 };
 
 const deleteStation = async (req, res) => {
-  const station = Station.findByIdAndRemove(req.body.name);
+  const station = await Station.findByIdAndRemove(req.params.id);
 
-  if (!stations) return res.status(404).send("Station not found.");
+  if (!station) return res.status(404).send("Station not found.");
 
   res.send(station);
 };
