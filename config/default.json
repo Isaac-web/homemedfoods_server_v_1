@@ -1,5 +1,7 @@
 {
   "db": "",
   "PORT": "",
-  "Invitation": {}
+  "Invitation": {
+    "expirationDurationMs": 86400
+  }
 }

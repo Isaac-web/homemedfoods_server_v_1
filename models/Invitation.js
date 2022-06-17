@@ -61,6 +61,7 @@ const validate = (invitation) => {
     message: Joi.string(),
     designationId: Joi.objectId().required(),
     stationId: Joi.objectId().required(),
+    expiresAt: Joi.date().required,
   });
 
   return schema.validate(Invitation);
