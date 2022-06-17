@@ -6,21 +6,21 @@ const Invitation = mongoose.model(
   "Invitation",
   new mongoose.Schema({
     employeeId: {
-      type: mongoose.Types.Object,
+      type: mongoose.Types.ObjectId,
       default: function () {
         return new mongoose.Types.ObjectId();
       },
       required: true,
     },
     title: {
-      Types: String,
+      type: String,
       minlength: 3,
       maxlength: 256,
       trim: true,
       required: true,
     },
     message: {
-      Types: String,
+      type: String,
       minlength: 3,
       maxlength: 1024,
       trim: true,
@@ -37,7 +37,7 @@ const Invitation = mongoose.model(
       required: true,
     },
     applicationLink: {
-      Types: String,
+      type: String,
       maxlength: 1024,
       trim: true,
       required: true,

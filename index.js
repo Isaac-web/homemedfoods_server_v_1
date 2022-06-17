@@ -7,7 +7,7 @@ const products = require("./routes/products");
 const discounts = require("./routes/discounts");
 const cities = require("./routes/cities");
 const stations = require("./routes/stations");
-const invitations = reuqire("./routes/invitations.js");
+const invitations = require("./routes/invitations.js");
 
 const app = express();
 app.get("/ping", (req, res) => {
