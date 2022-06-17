@@ -8,6 +8,7 @@ const discounts = require("./routes/discounts");
 const cities = require("./routes/cities");
 const stations = require("./routes/stations");
 const invitations = require("./routes/invitations.js");
+const designations = require("./routes/designations");
 
 const app = express();
 app.get("/ping", (req, res) => {
@@ -22,6 +23,7 @@ app.use("/api/discounts", discounts);
 app.use("/api/cities", cities);
 app.use("/api/stations", stations);
 app.use("/api/invitations", invitations);
+app.use("/api/designations", designations);
 
 
 const port = process.env.PORT || config.get("port");
