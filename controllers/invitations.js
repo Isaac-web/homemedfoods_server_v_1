@@ -22,6 +22,7 @@ const sendInvitation = async (req, res) => {
   let invitation = Invitation({
     title: req.body.title,
     message: req.body.message,
+    email: req.body.email,
     designation: req.body.designationId,
     station: req.body.stationId,
     expiresAt: req.body.expiresAt,
