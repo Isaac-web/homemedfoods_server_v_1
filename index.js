@@ -1,14 +1,14 @@
-const express = require("express");
 const config = require("config");
+const express = require("express");
 const mongoose = require("mongoose");
 
-const productCategory = require("./routes/productCategory");
-const products = require("./routes/products");
-const discounts = require("./routes/discounts");
 const cities = require("./routes/cities");
-const stations = require("./routes/stations");
-const invitations = require("./routes/invitations.js");
 const designations = require("./routes/designations");
+const discounts = require("./routes/discounts");
+const invitations = require("./routes/invitations.js");
+const products = require("./routes/products");
+const productCategory = require("./routes/productCategory");
+const stations = require("./routes/stations");
 
 const app = express();
 app.get("/ping", (req, res) => {
@@ -24,7 +24,6 @@ app.use("/api/cities", cities);
 app.use("/api/stations", stations);
 app.use("/api/invitations", invitations);
 app.use("/api/designations", designations);
-
 
 const port = process.env.PORT || config.get("port");
 mongoose
