@@ -10,6 +10,7 @@ const products = require("./routes/products");
 const productCategory = require("./routes/productCategory");
 const stations = require("./routes/stations");
 const employees = require("./routes/employees");
+const addresses = require("./routes/addresses");
 
 const app = express();
 app.get("/ping", (req, res) => {
@@ -26,6 +27,7 @@ app.use("/api/stations", stations);
 app.use("/api/invitations", invitations);
 app.use("/api/designations", designations);
 app.use("/api/employees", employees);
+app.use("/api/addresses", addresses);
 
 const port = process.env.PORT || config.get("port");
 mongoose

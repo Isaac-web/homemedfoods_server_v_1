@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
 
 const Address = mongoose.model(
   "Address",
@@ -9,6 +11,7 @@ const Address = mongoose.model(
     },
     line_1: {
       type: String,
+      maxlength: 3,
       maxlength: 1024,
       trim: true,
       required: true,
@@ -25,8 +28,9 @@ const Address = mongoose.model(
       trim: true,
     },
     city: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "City",
+      type: String, 
+      minlength: 2,
+      maxlength: 256,
       required: true,
     },
     coordinates: {
@@ -36,4 +40,20 @@ const Address = mongoose.model(
   })
 );
 
+const validate = (address) => {
+  const schema = Joi.object({
+    line_1: Joi.string().min(3).max(1024).required(),
+    line_2: Joi.string().min(3).max(1024).required(),
+    line_3: Joi.string().max(1024),
+    city: Joi.string().min(2).max(256).required(),
+    coordinates: {
+      long: Joi.number(),
+      lat: Joi.number(),
+    },
+  });
+
+  return schema.validate(address);
+};
+
 exports.Address = Address;
+exports.validate = validate;

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid");
+const { Address } = require("./Address");
 
 const emailValidationRegex =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -97,6 +98,11 @@ employeeSchema.methods.verifyStatus = async function () {
   }
 };
 
+employeeSchema.methods.getAddresses = async function () {
+  return await Address.find({ user: this._id });
+};
+
+
 const Employee = mongoose.model("Employee", employeeSchema);
 
 const validate = (employee) => {
@@ -126,6 +132,7 @@ const validateOnUpdate = (employee) => {
     address: {
       line_1: Joi.string(),
       line_2: Joi.string(),
+      line_3: Joi.string(),
       cityId: Joi.objectId(),
       coordinates: Joi.object(),
     },
