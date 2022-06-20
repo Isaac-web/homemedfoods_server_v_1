@@ -69,8 +69,8 @@ const Invitation = mongoose.model(
 
 const validate = (invitation) => {
   const schema = Joi.object({
-    title: Joi.string(),
-    message: Joi.string(),
+    title: Joi.string().min(3).max(256).required(),
+    message: Joi.string().min(3).max(1024).required(),
     email: Joi.string().email().required(),
     designationId: Joi.objectId().required(),
     stationId: Joi.objectId().required(),

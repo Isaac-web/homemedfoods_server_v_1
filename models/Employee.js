@@ -16,7 +16,6 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     maxlength: 256,
     trim: true,
-    required: true,
   },
   lastname: {
     type: String,
@@ -48,6 +47,13 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     //to be updated
   },
+  phone: {
+    type: String,
+    minlength: 3,
+    maxlength: 15,
+    required: true,
+    trim: true,
+  },
   image: {
     type: String,
     maxlength: 1024,
@@ -58,8 +64,8 @@ const employeeSchema = new mongoose.Schema({
     required: true,
   },
   designation: {
-    type: String,
-    //to be updated
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Designation",
   },
   verificationStage: {
     type: Number,
@@ -81,6 +87,7 @@ employeeSchema.methods.verifyStatus = async function () {
     this.email &&
     this.password &&
     this.address &&
+    this.phone &&
     this.station &&
     this.designation;
 
@@ -99,10 +106,9 @@ const validate = (employee) => {
     lastname: Joi.string().min(2).max(256).required(),
     dateOfBirth: Joi.date().required(),
     email: Joi.string().min(0).max(256).required(),
+    phone: Joi.string().min(3).max(15).required(),
     password: Joi.string().min(7).max(256).required(),
-    confirmPassword: Joi.string(7).max(256).required(),
-    designationId: Joi.objectId(),
-    stationId: Joi.objectId().required(),
+    confirmPassword: Joi.string().min(7).max(256).required(),
   });
 
   return schema.validate(employee);
@@ -110,11 +116,13 @@ const validate = (employee) => {
 
 const validateOnUpdate = (employee) => {
   const schema = Joi.object({
-    firstname: Joi.string().min(2).max(256),
-    lastname: Joi.string().min(2).max(256),
-    dateOfBirth: Joi.date().required(),
-    email: Joi.string().email().required(),
+    firstname: Joi.string().max(256),
+    lastname: Joi.string().max(256),
+    dateOfBirth: Joi.date(),
     image: Joi.string().max(1024),
+    designationId: Joi.objectId(),
+    stationId: Joi.objectId(),
+    phone: Joi.string().max(15),
     address: {
       line_1: Joi.string(),
       line_2: Joi.string(),

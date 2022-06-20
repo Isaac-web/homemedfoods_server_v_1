@@ -30,6 +30,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.3",
     "mongoose": "^6.3.5",
+    "nodemailer": "^6.7.5",
     "winston": "^3.7.2"
   }
 }
