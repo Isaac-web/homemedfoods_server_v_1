@@ -41,7 +41,6 @@ const sendInvitation = async (req, res) => {
   res.send(invitation);
 };
 
-
 const getInvitations = async (req, res) => {
   const invitations = await Invitation.find()
     .populate("designation")
@@ -56,6 +55,18 @@ const getInvitation = async (req, res) => {
     .populate("station");
 
   res.send(invitations);
+};
+
+const updateInvitation = async (req, res) => {
+  const invitation = await Invitation.findByIdAndUpdate(
+    req.params.id,
+    {
+      expiresAt: req.body.expiresAt,
+    },
+    { new: true }
+  );
+
+  res.send(invitation);
 };
 
 const deleteInvitation = async (req, res) => {
@@ -74,5 +85,6 @@ module.exports = {
   sendInvitation,
   getInvitations,
   getInvitation,
+  updateInvitation,
   deleteInvitation,
 };

@@ -7,6 +7,7 @@ const router = express.Router();
 router.post("/", controller.sendInvitation);
 router.get("/", controller.getInvitations);
 router.get("/:id", [validateId], controller.getInvitation);
+router.patch("/:id", [validateId], controller.updateInvitation);
 router.delete("/:id", [validateId], controller.deleteInvitation);
 
 module.exports = router;
