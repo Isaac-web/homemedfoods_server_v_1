@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid");
 const { Address } = require("./Address");
+const { addressSchema } = require("./Address");
 
 const emailValidationRegex =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -45,8 +46,8 @@ const employeeSchema = new mongoose.Schema({
     required: true,
   },
   address: {
-    type: String,
-    //to be updated
+    type: addressSchema,
+    required: true,
   },
   phone: {
     type: String,
@@ -80,7 +81,7 @@ const employeeSchema = new mongoose.Schema({
   lastSeen: Date,
 });
 
-employeeSchema.methods.verifyStatus = async function () {
+employeeSchema.methods.verifyRequiredData = async function () {
   const validData =
     this.firstname &&
     this.lastname &&
@@ -102,7 +103,6 @@ employeeSchema.methods.getAddresses = async function () {
   return await Address.find({ user: this._id });
 };
 
-
 const Employee = mongoose.model("Employee", employeeSchema);
 
 const validate = (employee) => {
@@ -113,6 +113,7 @@ const validate = (employee) => {
     dateOfBirth: Joi.date().required(),
     email: Joi.string().min(0).max(256).required(),
     phone: Joi.string().min(3).max(15).required(),
+    address: Joi.object().required(),
     password: Joi.string().min(7).max(256).required(),
     confirmPassword: Joi.string().min(7).max(256).required(),
   });
@@ -129,13 +130,7 @@ const validateOnUpdate = (employee) => {
     designationId: Joi.objectId(),
     stationId: Joi.objectId(),
     phone: Joi.string().max(15),
-    address: {
-      line_1: Joi.string(),
-      line_2: Joi.string(),
-      line_3: Joi.string(),
-      cityId: Joi.objectId(),
-      coordinates: Joi.object(),
-    },
+    address: Joi.object(),
   });
 
   return schema.validate(employee);

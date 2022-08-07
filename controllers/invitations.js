@@ -7,18 +7,17 @@ const { Designation } = require("../models/Designation");
 const sendInvitation = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  // console.log(error.details);
 
-  //look up designation
-
+  //look up the designation and station
   let designation = Designation.findById(req.body.designationId);
   let station = Station.findById(req.body.stationId);
-
   [station, designation] = await Promise.all([station, designation]);
 
+  //Return if any of them is not found
   if (!station) return res.status(404).send("Station not found.");
   if (!designation) return res.status(404).send("Designation not found.");
 
+  //compose invitation
   let invitation = Invitation({
     title: req.body.title,
     message: req.body.message,
@@ -31,7 +30,7 @@ const sendInvitation = async (req, res) => {
   const applicationLink = `${invitation._id}`;
   invitation.applicationLink = applicationLink;
 
-  //send mail
+  //email
   [invitation] = await Promise.all([invitation.save()]);
   if (!invitation)
     return res.status(424).send("Sorry. Could not send invitation.");
@@ -41,6 +40,7 @@ const sendInvitation = async (req, res) => {
 
   res.send(invitation);
 };
+
 
 const getInvitations = async (req, res) => {
   const invitations = await Invitation.find()
@@ -64,7 +64,7 @@ const deleteInvitation = async (req, res) => {
 
   const employee = await Employee.findById(invitation.employeeId);
   if (!employee) {
-    //send mail that invitation has been cancelled
+    //send mail that invitation has been retracted
   }
 
   res.send(invitation);

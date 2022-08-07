@@ -19,7 +19,7 @@ const register = async (req, res) => {
 
   const isExpired = Date.now() > Date.parse(invitation.expiresAt);
   if (isExpired)
-    return res.status(409).send("Sorry. The invitation is expired.");
+    return res.status(409).send("Sorry. Your invitation has expired.");
 
   const now = moment(new Date());
   const dateOfBirth = moment(new Date(req.body.dateOfBirth));
@@ -29,7 +29,7 @@ const register = async (req, res) => {
 
   let employee = await Employee.findById(invitation.employeeId);
   if (employee)
-    return res.status(409).send("Employee with this email is already exists.");
+    return res.status(409).send("Employee with given id already exists.");
 
   const salt = await bcrypt.genSalt(12);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -42,6 +42,7 @@ const register = async (req, res) => {
     dateOfBirth: req.body.dateOfBirth,
     email: req.body.email,
     phone: req.body.phone,
+    address: req.body.address,
     password: hashedPassword,
     station: invitation.station,
     designation: invitation.designation,
@@ -96,12 +97,10 @@ const updateEmployee = async (req, res) => {
       "lastname",
       "dateOfBirth",
       "image",
+      "address"
     ])
   );
-
-  if (req.body.address) {
-    //create or update address
-  }
+    
 
   if (req.body.designationId) {
     const designation = await Designation.findById(req.body.designationId);
