@@ -1,0 +1,7 @@
+{
+  "db": "mongodb://localhost/home_med_production",
+  "port": 90001,
+  "Invitation": {
+    "expirationDurationMs": 86400
+  }
+}

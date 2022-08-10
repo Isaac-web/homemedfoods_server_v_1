@@ -1,6 +1,9 @@
 {
   "db": "",
-  "PORT": "",
+  "PORT": 5000,
+  "auth": {
+    "privateKey": "dummy_private_key"
+  },
   "Invitation": {
     "expirationDurationMs": 86400
   }
