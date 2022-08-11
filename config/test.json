@@ -1,0 +1,10 @@
+{
+  "db": "mongodb://localhost/home_med_test",
+  "port": 5001,
+  "auth": {
+    "privateKey": "test_private_key"
+  },
+  "Invitation": {
+    "expirationDurationMs": 86400
+  }
+}

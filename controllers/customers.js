@@ -29,8 +29,8 @@ const register = async (req, res) => {
   await customer.save();
   customer.password = undefined;
 
-  const token = customer.generateAuthToken
-  res.header("x-aut-token", token).send(customer);
+  const token = customer.generateAuthToken();
+  res.header("x-auth-token", token).send(customer);
 };
 
 const login = async (req, res) => {
@@ -38,10 +38,16 @@ const login = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const customer = await Customer.findOne({ email: req.body.email });
-  if (!customer) return res.status(404).send("User not found.");
+  if (!customer) return res.status(404).send("Invalid email or password.");
+
+  const validPassword = await bcrypt.compare(
+    req.body.password,
+    customer.password
+  );
+  if (!validPassword) return res.status(400).send("Invalid email or password.");
 
   const token = customer.generateAuthToken();
-  res.send(token);
+  res.json({ token });
 };
 
 module.exports = {

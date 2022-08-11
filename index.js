@@ -1,6 +1,7 @@
-const config = require("config");
-const express = require("express");
 const mongoose = require("mongoose");
+const express = require("express");
+const cors = require("cors");
+const config = require("config");
 const debugdb = require("debug")("db");
 
 const cities = require("./routes/cities");
@@ -14,9 +15,6 @@ const employees = require("./routes/employees");
 const addresses = require("./routes/addresses");
 const customers = require("./routes/customers");
 
-
-console.log(config.get("auth.privateKey"));
-
 const app = express();
 app.get("/ping", (req, res) => {
   res.send("Pong");
@@ -24,6 +22,7 @@ app.get("/ping", (req, res) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use("/api/categories", productCategory);
 app.use("/api/products", products);
@@ -44,3 +43,5 @@ mongoose
     app.listen(port, () => console.info(`Listening on port ${port}...`));
   })
   .catch((err) => console.error(err.message, err));
+
+module.exports = app;

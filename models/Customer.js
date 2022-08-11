@@ -14,14 +14,14 @@ const customerSchema = new mongoose.Schema({
   },
   firstname: {
     type: String,
-    minlength: 3,
+    minlength: 2,
     maxlength: 100,
     trim: true,
     required: true,
   },
   lastname: {
     type: String,
-    minlength: 3,
+    minlength: 2,
     maxlength: 100,
     trim: true,
     required: true,
@@ -46,17 +46,15 @@ const customerSchema = new mongoose.Schema({
 });
 
 customerSchema.methods.generateAuthToken = function () {
-  console.log("Hello World");
   return jwt.sign({ _id: this._id }, config.get("auth.privateKey"));
 };
 
 const Customer = mongoose.model("Customer", customerSchema);
 
-
 const validate = (customer) => {
   const schema = Joi.object({
-    firstname: Joi.string().min(3).max(100).required(),
-    lastname: Joi.string().min(3).max(100).required(),
+    firstname: Joi.string().min(2).max(100).required(),
+    lastname: Joi.string().min(2).max(100).required(),
     email: Joi.string().email().max(100).required(),
     phone: Joi.string().min(3).max(15).required(),
     password: Joi.string().min(7).max(150).required(),
