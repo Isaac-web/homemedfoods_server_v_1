@@ -65,9 +65,8 @@ describe("/api/customers", () => {
     });
 
     it("should return 400 if firstname is more than 100 characters", async () => {
-      const str = new Array(101).join("*"); // does not work when provided as string
-      payload.firstname =
-        "****************************************************************************************************************";
+      const str = new Array(102).join("*"); // does not work when provided as string
+      payload.firstname = str;
 
       const res = await run();
 
@@ -96,9 +95,8 @@ describe("/api/customers", () => {
     });
 
     it("should return 400 if firstname is more than 100 characters", async () => {
-      const str = new Array(101).join("*"); // does not work when provided as string
-      payload.lastname =
-        "****************************************************************************************************************";
+      const str = new Array(102).join("*"); // does not work when provided as string
+      payload.lastname = str;
 
       const res = await run();
 
@@ -117,13 +115,41 @@ describe("/api/customers", () => {
       expect(res.text).toContain("is required");
     });
 
-    it("should return 400 if invalid email is required", async () => {
+    it("should return 400 if email is invalid", async () => {
       payload.email = "invalid_email";
 
       const res = await run();
 
       expect(res.status).toBe(400);
       expect(res.text).toContain("must be a valid email");
+    });
+
+    it("should return 400 if phone is not provided", async () => {
+      delete payload.phone;
+
+      const res = await run();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 if phone is less than 3 characters", async () => {
+      payload.phone = "12";
+
+      const res = await run();
+
+      expect(res.status).toBe(400);
+      expect(res.text).toMatch(
+        '"phone" length must be at least 3 characters long'
+      );
+    });
+
+    it("should return 400 if phone is more than 15 characters", async () => {
+      const str = new Array(17).join("*");
+      payload.phone = str;
+
+      const res = await run();
+
+      expect(res.status).toBe(400);
     });
 
     it("should return 400 if password is not provided", async () => {
@@ -195,7 +221,7 @@ describe("/api/customers", () => {
       expect(res.text).toMatch("Passwords donnot match.");
     });
 
-    it("should return 400 if user already exist", async () => {
+    it("should return 400 if user already exists", async () => {
       await Customer.insertMany([payload]);
 
       const res = await run();
@@ -261,7 +287,7 @@ describe("/api/customers", () => {
       return request(server).post("/api/customers/login").send(payload);
     };
 
-    it("should return 400 if no inputs are provided", async () => {
+    it("should return 400 if no input is provided", async () => {
       payload = null;
 
       const res = await run();
@@ -278,7 +304,7 @@ describe("/api/customers", () => {
       expect(res.text).toMatch('"email" is required');
     });
 
-    it("should return 400 if invalid email is entered", async () => {
+    it("should return 400 if email is invalid", async () => {
       payload.email = "invalid_email";
 
       const res = await run();

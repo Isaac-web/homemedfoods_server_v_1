@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const { Customer, validate, validateAuth } = require("../models/Customer");
-const jwt = require("jsonwebtoken");
+
 
 const register = async (req, res) => {
   //For now, email customer will be logged in automatically
@@ -52,5 +52,5 @@ const login = async (req, res) => {
 
 module.exports = {
   register,
-  login
+  login,
 };

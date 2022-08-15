@@ -1,6 +1,6 @@
 {
   "db": "mongodb://localhost/home_med_test",
-  "port": 5001,
+  "port": 5003,
   "auth": {
     "privateKey": "test_private_key"
   },
