@@ -1,10 +1,9 @@
 const request = require("supertest");
-const mongooses = require("mongoose");
+const mongoose = require("mongoose");
 
 const app = require("../../index");
 const { Customer } = require("../../models/Customer");
 const { CustomerAddress } = require("./../../models/CustomerAddress.js");
-const { default: mongoose } = require("mongoose");
 
 describe("/api/customer/addresses", () => {
   let server = null;
@@ -38,6 +37,26 @@ describe("/api/customer/addresses", () => {
     const customer = res.body;
 
     return { token, customer };
+  };
+
+  const createAddress = (customer) => {
+    const payload = {
+      line_1: "Address Line 1",
+      line_2: "Address Line 2",
+      line_3: "Address line 3",
+      suburb: "Adum",
+      city: "Kumasi",
+      digitalAddress: "AUI11003X",
+      coords: {
+        long: 100,
+        lat: 100,
+      },
+    };
+
+    return request(server)
+      .post("/api/customers/addresses")
+      .send(payload)
+      .set("x-auth-token", customer.token);
   };
 
   describe("POST/", () => {
@@ -223,26 +242,6 @@ describe("/api/customer/addresses", () => {
     });
   });
 
-  const createAddress = (customer) => {
-    const payload = {
-      line_1: "Address Line 1",
-      line_2: "Address Line 2",
-      line_3: "Address line 3",
-      suburb: "Adum",
-      city: "Kumasi",
-      digitalAddress: "AUI11003X",
-      coords: {
-        long: 100,
-        lat: 100,
-      },
-    };
-
-    return request(server)
-      .post("/api/customers/addresses")
-      .send(payload)
-      .set("x-auth-token", customer.token);
-  };
-
   describe("GET /", () => {
     let customer = null;
     let address = null;
@@ -281,13 +280,84 @@ describe("/api/customer/addresses", () => {
     it("should return the addresses in the body", async () => {
       const res = await run();
 
-      console.log(res.body);
       expect(res.body).not.toBe(null);
       expect(res.body.length).toBeGreaterThanOrEqual(1);
       expect(res.body[0]).toHaveProperty("customerId");
       expect(res.body[0]).toHaveProperty("city");
       expect(res.body[0]).toHaveProperty("suburb");
       expect(res.body[0]).toHaveProperty("coords");
+    });
+  });
+
+  describe("DELETE /:id", () => {
+    let address = null;
+    let customer = null;
+    beforeEach(async () => {
+      customer = await createCustomer();
+      const { body: addressBody } = await createAddress(customer);
+      address = addressBody;
+    });
+
+    afterEach(async () => {
+      await CustomerAddress.remove({});
+      await Customer.remove({});
+    });
+
+    const run = () => {
+      const req = request(server).delete(
+        `/api/customers/addresses/${address._id.toString()}`
+      );
+
+      if (customer.token) req.set("x-auth-token", customer.token);
+
+      return req;
+    };
+
+    it("should return 401 if user is not logged in", async () => {
+      delete customer.token;
+
+      const res = await run();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 404 if address id is invalid", async () => {
+      address._id = "1234";
+
+      const res = await run();
+
+      expect(res.status).toBe(404);
+      expect(res.text).toMatch("given id not found");
+    });
+
+    it("should return 404 if address is not found", async () => {
+      address._id = mongoose.Types.ObjectId();
+
+      const res = await run();
+
+      expect(res.status).toBe(404);
+    });
+
+    it("should return 200 if requirements are satisfied", async () => {
+      const res = await run();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should delete the customer's address from the database", async () => {
+      await run();
+
+      const customerAddress = await CustomerAddress.findById(customer._id);
+
+      expect(customerAddress).toBeNull();
+    });
+
+    it("should return the deleted address to the client", async () => {
+      const res = await run();
+
+      expect(res.status).not.toBeNull();
+      delete address._id;
+      expect(res.body).toMatchObject(address);
     });
   });
 });
