@@ -21,7 +21,7 @@ describe("/api/customer/addresses", () => {
     await mongoose.connection.close();
   });
 
-  const getAuthToken = async () => {
+  const createCustomer = async () => {
     const signUpData = {
       firstname: "John",
       lastname: "Doe",
@@ -34,7 +34,10 @@ describe("/api/customer/addresses", () => {
       .post("/api/customers/register")
       .send(signUpData);
 
-    return res.headers["x-auth-token"] || null;
+    const token = res.headers["x-auth-token"] || null;
+    const customer = res.body;
+
+    return { token, customer };
   };
 
   describe("POST/", () => {
@@ -54,7 +57,8 @@ describe("/api/customer/addresses", () => {
         },
       };
 
-      token = await getAuthToken();
+      customer = await createCustomer();
+      token = customer.token;
     });
 
     const run = () => {
@@ -211,9 +215,6 @@ describe("/api/customer/addresses", () => {
 
       const address = await CustomerAddress.findOne();
 
-      console.log(payload);
-      console.log("Customer Address", address);
-
       expect(address).not.toBeNull();
       expect(address).toHaveProperty("customerId");
       expect(address).toHaveProperty("line_1", payload.line_1);
@@ -222,18 +223,71 @@ describe("/api/customer/addresses", () => {
     });
   });
 
-  describe("GET /", () => {
-    beforeEach(async () => {
-      //create a customer
-      const { body: customer } = await request(server).post(
-        "/api/customers/register"
-      );
-      console.log(customer);
+  const createAddress = (customer) => {
+    const payload = {
+      line_1: "Address Line 1",
+      line_2: "Address Line 2",
+      line_3: "Address line 3",
+      suburb: "Adum",
+      city: "Kumasi",
+      digitalAddress: "AUI11003X",
+      coords: {
+        long: 100,
+        lat: 100,
+      },
+    };
 
-      //create address
-      //get customer addresses
+    return request(server)
+      .post("/api/customers/addresses")
+      .send(payload)
+      .set("x-auth-token", customer.token);
+  };
+
+  describe("GET /", () => {
+    let customer = null;
+    let address = null;
+    beforeEach(async () => {
+      customer = await createCustomer();
+      address = await createAddress(customer);
     });
 
-    it("it should fetch the customers addresses", () => {});
+    afterEach(async () => {
+      await CustomerAddress.remove({});
+      await Customer.remove({});
+    });
+
+    const run = () => {
+      const req = request(server).get("/api/customers/addresses");
+
+      if (customer.token) req.set("x-auth-token", customer.token);
+
+      return req;
+    };
+
+    it("should return 401 if customer is not logged in", async () => {
+      delete customer.token;
+
+      const res = await run();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 200 if user is logged in", async () => {
+      const res = await run();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should return the addresses in the body", async () => {
+      const res = await run();
+
+      console.log(res.body);
+      expect(res.body).not.toBe(null);
+      expect(res.body.length).toBeGreaterThanOrEqual(1);
+      expect(res.body[0]).toHaveProperty("customerId");
+      expect(res.body[0]).toHaveProperty("city");
+      expect(res.body[0]).toHaveProperty("suburb");
+      expect(res.body[0]).toHaveProperty("coords");
+    });
   });
 });
