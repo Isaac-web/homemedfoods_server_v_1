@@ -244,10 +244,23 @@ describe("/api/customer/addresses", () => {
 
   describe("GET /", () => {
     let customer = null;
-    let address = null;
+    let payload = null;
     beforeEach(async () => {
       customer = await createCustomer();
       address = await createAddress(customer);
+
+      payload = {
+        line_1: "Address Line 1",
+        line_2: "Address Line 2",
+        line_3: "Address line 3",
+        suburb: "Adum",
+        city: "Kumasi",
+        digitalAddress: "AUI11003X",
+        coords: {
+          long: 100,
+          lat: 100,
+        },
+      };
     });
 
     afterEach(async () => {
@@ -287,6 +300,103 @@ describe("/api/customer/addresses", () => {
       expect(res.body[0]).toHaveProperty("suburb");
       expect(res.body[0]).toHaveProperty("coords");
     });
+  });
+
+  describe("PATCH /:id", () => {
+    let customer;
+    let address;
+    let payload;
+
+    beforeEach(async () => {
+      customer = await createCustomer();
+      const { body } = await createAddress(customer);
+      address = body;
+
+      payload = {
+        line_1: "Address Line 1",
+        line_2: "Address Line 2",
+        line_3: "Address line 3",
+        suburb: "Adum",
+        city: "Kumasi",
+        digitalAddress: "AUI11003X",
+        coords: {
+          long: 100,
+          lat: 100,
+        },
+      };
+    });
+
+    afterEach(async () => {
+      await CustomerAddress.remove({});
+      await Customer.remove({});
+    });
+
+    const run = () => {
+      const req = request(server)
+        .patch(`/api/customers/addresses/${address._id}`)
+        .send(payload);
+
+      if (customer.token) req.set("x-auth-token", customer.token);
+
+      return req;
+    };
+
+    it("should return 401 if user is not logged int", async () => {
+      delete customer.token;
+
+      const res = await run();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 404 if id is invalid", async () => {
+      address._id = "Invalid_id";
+
+      const res = await run();
+
+      expect(res.status).toBe(404);
+    });
+
+    it("should return 404 if address is not found", async () => {
+      const id = new mongoose.Types.ObjectId().toHexString();
+      address._id = id;
+
+      const res = await run();
+
+      expect(res.status).toBe(404);
+    });
+
+    it("should return 400 if suburb is more than 100 characters", async () => {
+      payload.suburb = new Array(102).join("*");
+
+      const res = await run();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 if city is more than 100 characters", async () => {
+      payload.city = new Array(102).join("*");
+
+      const res = await run();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 if digital address is not a string", async () => {
+      payload.digitalAddress = new Object();
+
+      const res = await run();
+
+      expect(res.status).toBe(400);
+    });
+
+    // it("should return 400 if no input is provided", async () => {
+    //   payload = {};
+
+    //   const res = await run();
+
+    //   expect(res.status).toBe(400);
+    // });
   });
 
   describe("DELETE /:id", () => {

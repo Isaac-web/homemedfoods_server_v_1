@@ -1,12 +1,17 @@
 const express = require("express");
-const controller = require("../controllers/addresses");
+const {
+  createAddress,
+  getAddresses,
+  updateAddress,
+  deleteAddress,
+} = require("../controllers/addresses");
+const customerAuth = require("../middleware/customerAuth");
 const validateId = require("../middleware/validateId");
 
 const router = express.Router();
-
-router.post("/:userType/:id", [validateId], controller.createAddress);
-router.get("/:userId", controller.getAddresses);
-router.patch("/:id", [validateId], controller.updateAddress);
-router.delete("/:id", [validateId], controller.deleteAddress);
+router.post("/", [customerAuth], createAddress);
+router.get("/", [customerAuth], getAddresses);
+router.patch("/:id", [validateId, customerAuth], updateAddress);
+router.delete("/:id", [validateId, customerAuth], deleteAddress);
 
 module.exports = router;

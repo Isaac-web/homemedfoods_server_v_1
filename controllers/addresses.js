@@ -1,33 +1,15 @@
-const { Employee } = require("../models/Employee");
-const { Address, validate } = require("../models/Address");
-const validateObjectId = require("../utils/validateObjectId");
-const mongoose = require("mongoose");
+const _ = require("lodash");
+const { Address, validate, validateOnUpdate } = require("../models/Address");
 
 const createAddress = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let user;
-  let { userType, id: userId } = req.params;
-  userType = userType.toLowerCase();
-  switch (userType) {
-    case "employee":
-      user = await Employee.findById(userId);
-      break;
-    default:
-      user = null;
-  }
+  const address = new Address(
+    _.pick(req.body, ["coordinates", "area", "digitalAddress"])
+  );
 
-  if (!user) return res.status(404).send("User not found.");
-
-  const address = new Address({
-    user: user._id,
-    line_1: req.body.line_1,
-    line_2: req.body.line_2,
-    line_3: req.body.line_3,
-    city: req.body.city,
-    coordinates: req.body.coordinates,
-  });
+  address.userId = req.customer._id;
 
   await address.save();
 
@@ -35,27 +17,18 @@ const createAddress = async (req, res) => {
 };
 
 const getAddresses = async (req, res) => {
-  const { userId } = req.params;
-
-  const isValidId = validateObjectId(userId);
-  if (!isValidId) return res.status(400).send("Invalid ObjectId");
-
-  const addresses = await Address.find({ user: userId });
-
-  res.send(addresses);
+  const address = await Address.find({ userId: req.customer._id });
+  res.send(address);
 };
 
 const updateAddress = async (req, res) => {
+  const { error } = validateOnUpdate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
   const address = await Address.findByIdAndUpdate(
     req.params.id,
     {
-      $set: {
-        line_1: req.body.line_1,
-        line_2: req.body.line_2,
-        line_3: req.body.line_3,
-        city: req.body.cityId,
-        coordinates: req.body.coordinates,
-      },
+      $set: _.pick(req.body, ["coordinates", "area", "area", "digitalAddress"]),
     },
     { new: true }
   );

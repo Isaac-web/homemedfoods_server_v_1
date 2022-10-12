@@ -1,40 +1,42 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-Joi.objectId = require("joi-objectid")(Joi);
-
+Joi.objectId = require("joi-objectid");
 
 const addressSchema = new mongoose.Schema({
-  line_1: {
-    type: String,
-    maxlength: 3,
-    maxlength: 1024,
-    trim: true,
-    required: true,
-  },
-  line_2: {
-    type: String,
-    maxlength: 1024,
-    trim: true,
-  },
-  line_3: {
-    type: String,
-    maxlength: 1024,
-    trim: true,
-  },
-  suburb: {
-    type: String,
-    maxlength: 100,
-    trim: true,
-  },
-  city: {
-    type: String,
-    minlength: 2,
-    maxlength: 256,
+  userId: {
+    type: mongoose.Types.ObjectId,
+    createIndex: true,
     required: true,
   },
   coordinates: {
-    long: Number,
-    lat: Number,
+    lat: {
+      type: Number,
+      required: true,
+    },
+    long: {
+      type: Number,
+      required: true,
+    },
+  },
+  area: {
+    type: String,
+    maxlength: 150,
+    minlength: 2,
+    required: true,
+  },
+  digitalAddress: {
+    type: String,
+    maxlength: 150,
+  },
+  street: {
+    type: String,
+    minlength: 2,
+    maxlength: 150,
+  },
+  formattedAddress: {
+    type: String,
+    minlength: 3,
+    maxlength: 256,
   },
 });
 
@@ -42,19 +44,34 @@ const Address = mongoose.model("Address", addressSchema);
 
 const validate = (address) => {
   const schema = Joi.object({
-    line_1: Joi.string().min(3).max(1024).required(),
-    line_2: Joi.string().min(3).max(1024).required(),
-    line_3: Joi.string().max(1024),
-    city: Joi.string().min(2).max(256).required(),
-    coordinates: {
-      long: Joi.number(),
-      lat: Joi.number(),
-    },
+    coordinates: Joi.object({
+      lat: Joi.number().required(),
+      long: Joi.number().required(),
+    }).required(),
+    area: Joi.string().min(2).max(150).required(),
+    digitalAddress: Joi.string().max(150),
+    street: Joi.string().max(150),
+    formattedAddress: Joi.string().min(3).max(256),
   });
 
   return schema.validate(address);
 };
 
-exports.validate = validate;
-exports.addressSchema = addressSchema;
+const validateOnUpdate = (address) => {
+  const schema = Joi.object({
+    coordinates: Joi.object({
+      lat: Joi.number(),
+      long: Joi.number(),
+    }),
+    area: Joi.string().min(2).max(150),
+    digitalAddress: Joi.string().max(150),
+    street: Joi.string().max(150),
+    formattedAddress: Joi.string().min(3).max(256),
+  });
+
+  return schema.validate(address);
+};
+
 exports.Address = Address;
+exports.validate = validate;
+exports.validateOnUpdate = validateOnUpdate;

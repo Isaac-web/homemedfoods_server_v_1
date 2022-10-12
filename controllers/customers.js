@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const { Customer, validate, validateAuth } = require("../models/Customer");
-
+const {ShoppingCart} = require("../models/ShoppingCart");
 
 const register = async (req, res) => {
   //For now, email customer will be logged in automatically
@@ -26,9 +26,15 @@ const register = async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
   customer.password = hashedPassword;
 
-  await customer.save();
-  customer.password = undefined;
+  //create a shopping cart for the customer
+  const shoppingCart = new ShoppingCart({
+    _id: customer._id,
+    userId: customer._id,
+  });
 
+  await Promise.all([customer.save(), shoppingCart.save()]);
+
+  customer.password = undefined;
   const token = customer.generateAuthToken();
   res.header("x-auth-token", token).send(customer);
 };

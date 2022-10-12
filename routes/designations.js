@@ -1,10 +1,12 @@
+const controller = require("../controllers/designations");
 const express = require("express");
-const controller = require("../controllers/desinations");
 const validateId = require("../middleware/validateId");
+
 const router = express.Router();
 
-router.post("/", controller.createDesignation);
+//TODO: IMPLEMENT AUTHENTICATION ON THE ENDPOINTS
 router.get("/", controller.getDesignations);
+router.post("/", controller.createDesignation);
 router.patch("/:id", [validateId], controller.updateDesignation);
 router.delete("/:id", [validateId], controller.deleteDesignation);
 

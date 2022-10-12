@@ -78,6 +78,8 @@ const validateOnUpdate = (address) => {
       lat: Joi.number(),
     },
   });
+
+  return schema.validate(address);
 };
 
 exports.validate = validate;
