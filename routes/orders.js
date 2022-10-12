@@ -1,13 +1,15 @@
 const express = require("express");
 const controller = require("../controllers/orders");
 const customerAuth = require("../middleware/customerAuth");
-// const validateId = require("../middleware/validateId");
+const validateId = require("../middleware/validateId");
 
 const router = express.Router();
 
 router.post("/", [customerAuth], controller.createOrder);
-router.get("/", (req, res) => {});
-router.patch("/", (req, res) => {});
-router.delete("/", (req, res) => {});
+router.get("/", controller.getOrders);
+router.get("/customer", [customerAuth], controller.getCustomerOrders)
+router.patch("/:id/status", [validateId], controller.updateOrderStatus);
+router.patch("/:id", [validateId], controller.updateOrder);
+router.delete("/", (req, res) => {}); //Todo: Only the admin should be able to delete the order
 
 module.exports = router;

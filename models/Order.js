@@ -43,18 +43,25 @@ const orderSchema = new mongoose.Schema({
   rider: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Employee",
-    required: true,
   },
   order_items: {
-    type: Array,
-    deafult: [orderItemSchema],
+    type: [orderItemSchema],
+    required: true,
+    valdiate: {
+      validator: function (order) {
+        return Boolean(order.length);
+      },
+      message: "Order should have at least one item.",
+    },
   },
   delivery_address: {
     type: deliveryAddressSchema,
     required: true,
   },
   payment_method: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "PaymentMethod",
+    required: true,
   },
   total: {
     type: Number,
@@ -67,6 +74,10 @@ const orderSchema = new mongoose.Schema({
     },
   },
 });
+
+orderSchema.method.updateStatus = function () {
+  console.log("update...");
+};
 
 const Order = mongoose.model("Order", orderSchema);
 
@@ -83,13 +94,23 @@ const validate = (order) => {
       )
       .required(),
     delivery_address: Joi.object({
-      coordinate: Joi.object({
+      coordinates: Joi.object({
         lat: Joi.number().required(),
         long: Joi.number().required(),
       }),
     }).required(),
-    payment_method: Joi.string().required(),
+    payment_method_id: Joi.objectId().required(),
     total: Joi.number().min(0).greater(0),
+  });
+
+  return schema.validate(order);
+};
+
+const validateOnUpdate = (order) => {
+  const schema = Joi.object({
+    comment: Joi.string().max(500),
+    riderId: Joi.objectId(),
+    delivered_at: Joi.date(),
   });
 
   return schema.validate(order);
@@ -97,3 +118,4 @@ const validate = (order) => {
 
 exports.Order = Order;
 exports.validate = validate;
+exports.validateOnUpdate = validateOnUpdate;
