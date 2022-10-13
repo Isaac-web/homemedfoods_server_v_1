@@ -4,6 +4,8 @@ Joi.objectId = require("joi-objectid");
 const { Address } = require("./Address");
 const { addressSchema } = require("./Address");
 
+
+//address, digital address, imageUri, branch
 const emailValidationRegex =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 const employeeSchema = new mongoose.Schema({
