@@ -12,19 +12,19 @@ const employeeSchema = new mongoose.Schema({
   firstname: {
     type: String,
     minlength: 2,
-    maxlength: 256,
+    maxlength: 50,
     trim: true,
     required: true,
   },
   middlename: {
     type: String,
-    maxlength: 256,
+    maxlength: 50,
     trim: true,
   },
   lastname: {
     type: String,
     minlength: 2,
-    maxlength: 256,
+    maxlength: 50,
     trim: true,
     required: true,
   },
@@ -35,7 +35,7 @@ const employeeSchema = new mongoose.Schema({
   email: {
     type: String,
     minlength: 7,
-    maxlength: 256,
+    maxlength: 100,
     regex: emailValidationRegex,
     trim: true,
     required: true,
@@ -48,28 +48,37 @@ const employeeSchema = new mongoose.Schema({
     required: true,
   },
   address: {
-    type: addressSchema,
+    type: String,
+    maxlength: 256,
     required: true,
+    trim: true,
+  },
+  digitalAddress: {
+    type: String,
+    maxlength: 100,
+    trim: true,
   },
   phone: {
     type: String,
     minlength: 3,
     maxlength: 15,
+    createIndex: true,
     required: true,
     trim: true,
   },
-  image: {
+  imageUri: {
     type: String,
     maxlength: 1024,
   },
-  station: {
+  branch: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Station",
+    ref: "Branch",
     required: true,
   },
   designation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Designation",
+    required: true,
   },
   verificationStage: {
     type: Number,
@@ -77,9 +86,7 @@ const employeeSchema = new mongoose.Schema({
     max: 2,
     default: 0,
   },
-  dateCommenced: {
-    type: Date,
-  },
+  dateCommenced: Date,
   lastSeen: Date,
 });
 
@@ -101,10 +108,6 @@ employeeSchema.methods.verifyRequiredData = async function () {
   }
 };
 
-employeeSchema.methods.getAddresses = async function () {
-  return await Address.find({ user: this._id });
-};
-
 const Employee = mongoose.model("Employee", employeeSchema);
 
 const validate = (employee) => {
@@ -115,7 +118,8 @@ const validate = (employee) => {
     dateOfBirth: Joi.date().required(),
     email: Joi.string().min(0).max(256).required(),
     phone: Joi.string().min(3).max(15).required(),
-    address: Joi.object().required(),
+    address: Joi.string().max(256).required(),
+    digitalAddress: Joi.string().max(100).required(),
     password: Joi.string().min(7).max(256).required(),
     confirmPassword: Joi.string().min(7).max(256).required(),
   });
@@ -125,14 +129,17 @@ const validate = (employee) => {
 
 const validateOnUpdate = (employee) => {
   const schema = Joi.object({
-    firstname: Joi.string().max(256),
-    lastname: Joi.string().max(256),
+    firstname: Joi.string().max(50),
+    middlename: Joi.string().max(50),
+    lastname: Joi.string().max(50),
     dateOfBirth: Joi.date(),
     image: Joi.string().max(1024),
     designationId: Joi.objectId(),
-    stationId: Joi.objectId(),
+    branchId: Joi.objectId(),
     phone: Joi.string().max(15),
     address: Joi.object(),
+    dateCommenced: Joi.date(),
+    lastSeen: Joi.date(),
   });
 
   return schema.validate(employee);
