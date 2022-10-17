@@ -58,6 +58,11 @@ const orderSchema = new mongoose.Schema({
     type: deliveryAddressSchema,
     required: true,
   },
+  branch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Branch",
+    required: true,
+  },
   payment_method: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "PaymentMethod",
@@ -99,6 +104,7 @@ const validate = (order) => {
         long: Joi.number().required(),
       }),
     }).required(),
+    branch: Joi.objectId().required(),
     payment_method_id: Joi.objectId().required(),
     total: Joi.number().min(0).greater(0),
   });

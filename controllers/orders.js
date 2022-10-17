@@ -1,3 +1,4 @@
+const { Branch } = require("../models/Branch");
 const { Order, validate, validateOnUpdate } = require("../models/Order");
 const { PaymentMethod } = require("../models/PaymentMethod");
 
@@ -5,9 +6,12 @@ const createOrder = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const paymentMethod = await PaymentMethod.findById(
-    req.body.payment_method_id
-  );
+  const [branch, paymentMethod] = await Promise.all([
+    Branch.findById(req.body.branch),
+    PaymentMethod.findById(req.body.payment_method_id),
+  ]);
+
+  if (!branch) return res.status(404).send("Branch not found.");
   if (!paymentMethod) return res.status(404).send("Payment method not found.");
 
   const orderItems = req.body.order_items.map((item) => ({
@@ -20,6 +24,7 @@ const createOrder = async (req, res) => {
     comment: req.body.comment,
     order_items: orderItems,
     delivery_address: req.body.delivery_address,
+    branch: branch,
     payment_method: paymentMethod,
     total: req.body.total,
   });
@@ -30,7 +35,7 @@ const createOrder = async (req, res) => {
 };
 
 const getOrders = async (req, res) => {
-  let orders = await Order.find().populate("customer");
+  let orders = await Order.find().populate("customer").populate("branch");
 
   res.send(orders);
 };
@@ -57,8 +62,8 @@ const updateOrderStatus = async (req, res) => {
 };
 
 const updateOrder = async (req, res) => {
-  const {error} = validateOnUpdate(req.body);
-  if(error) return res.status(400).send(error.details[0].message);
+  const { error } = validateOnUpdate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
   const { comment, delivered_at, riderId } = req.body;
 
@@ -70,7 +75,7 @@ const updateOrder = async (req, res) => {
 
   await order.save();
 
-  res.send(order)
+  res.send(order);
 };
 
 module.exports = {
