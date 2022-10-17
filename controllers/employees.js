@@ -4,6 +4,7 @@ const moment = require("moment");
 const { Employee, validate, validateOnUpdate } = require("../models/Employee");
 const { Invitation } = require("../models/Invitation");
 const { Station } = require("../models/Station");
+const { Branch } = require("../models/Branch");
 const { Designation } = require("../models/Designation");
 
 const register = async (req, res) => {
@@ -23,9 +24,9 @@ const register = async (req, res) => {
 
   const now = moment(new Date());
   const dateOfBirth = moment(new Date(req.body.dateOfBirth));
-  const isAdult = now.diff(dateOfBirth, "years") >= 18;
+  const isAdult = now.diff(dateOfBirth, "years") >= 16;
   if (!isAdult)
-    return res.status(400).send("You have to be 18 years or above.");
+    return res.status(400).send("You have to be 16 years or above.");
 
   let employee = await Employee.findById(invitation.employeeId);
   if (employee)
@@ -48,25 +49,26 @@ const register = async (req, res) => {
     designation: invitation.designation,
   });
 
-  let station = Station.findById(invitation.station);
+  // console.log(invitation);
+  // res.send(invitation.branch);
+
+  let branch = Branch.findById(invitation.branch);
   let designation = Designation.findById(invitation.designation);
 
-  [station, designation] = await Promise.all([
-    station,
-    designation,
-    employee.save(),
-  ]);
-
-  employee.password = undefined;
-  employee.station = station;
+  [branch, designation] = await Promise.all([branch, designation]);
+  employee.branch = branch;
   employee.designation = designation;
+  
+  await employee.save();
 
+  // remove password from response body
+  employee.password = undefined; 
   res.send(employee);
 };
 
 const getEmployees = async (req, res) => {
   const employees = await Employee.find()
-    .populate("station", "name city")
+    .populate("branch")
     .populate("designation");
 
   res.send(employees);
@@ -74,7 +76,7 @@ const getEmployees = async (req, res) => {
 
 const getEmployee = async (req, res) => {
   const employee = await Employee.findById(req.params.id)
-    .populate("station")
+    .populate("branch")
     .populate("designation");
 
   res.send(employee);

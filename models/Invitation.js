@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-Joi.objectId = require("joi-objectid")(Joi);
 
+console;
 
 const emailValidationRegex =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -39,13 +39,13 @@ const Invitation = mongoose.model(
       required: true,
     },
     designation: {
-      type: mongoose.Schema.Types.Object,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Designation",
       required: true,
     },
-    station: {
-      type: mongoose.Schema.Types.Object,
-      ref: "Station",
+    branch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
       required: true,
     },
     applicationLink: {
@@ -54,7 +54,7 @@ const Invitation = mongoose.model(
       trim: true,
       required: true,
     },
-    sentAt: {
+    issuedAt: {
       type: Date,
       default: function () {
         return Date.now();
@@ -72,8 +72,8 @@ const validate = (invitation) => {
     title: Joi.string().min(3).max(256).required(),
     message: Joi.string().min(3).max(1024).required(),
     email: Joi.string().email().required(),
-    designationId: Joi.objectId().required(),
-    stationId: Joi.objectId().required(),
+    designationId: Joi.string().required(),
+    branchId: Joi.string().required(),
     expiresAt: Joi.date().required(),
   });
 
