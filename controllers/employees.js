@@ -79,6 +79,8 @@ const getEmployee = async (req, res) => {
     .populate("branch")
     .populate("designation");
 
+  employee.password = undefined;
+
   res.send(employee);
 };
 
@@ -87,7 +89,7 @@ const updateEmployee = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const employee = await Employee.findById(req.params.id)
-    .populate("station")
+    .populate("branch")
     .populate("designation");
 
   if (!employee) return res.status(404).send("Employee not found.");
@@ -99,10 +101,9 @@ const updateEmployee = async (req, res) => {
       "lastname",
       "dateOfBirth",
       "image",
-      "address"
+      "address",
     ])
   );
-    
 
   if (req.body.designationId) {
     const designation = await Designation.findById(req.body.designationId);
