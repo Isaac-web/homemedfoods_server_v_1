@@ -1,5 +1,6 @@
 {
   "auth": {
     "privateKey": "homedAuthPrivateKey"
-  }
+  },
+  "db": "app_db"
 }
