@@ -133,7 +133,7 @@ const deleteEmployee = async (req, res) => {
 
   if (!employee) return res.status(404).send("Employee not found.");
 
-  delete employee.password;
+  employee.password = undefined;
   res.send(employee);
 };
 
