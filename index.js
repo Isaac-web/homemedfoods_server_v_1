@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const config = require("config");
 
 const app = express();
+require("dot-env");
 
 app.get("/api/ping", (req, res) => {
   res.send(`Connected to ${config.get("db")}`);
@@ -10,7 +11,7 @@ app.get("/api/ping", (req, res) => {
 
 mongoose
   .connect(config.get("db"))
-  .then(() => console.log(`Connected to ${config.get("db")}...`))
+  .then(() => console.log(`Connected to ${process.env.app_db}...`))
   .catch((err) => console.log("Could not connect to db..."));
 const port = process.env.PORT || 5000;
 app.listen(5000, () => {console.log(`Listening on port ${port}...`)})
