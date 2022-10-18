@@ -1,6 +1,6 @@
 {
-  "db": "mongodb://localhost/home_med_production",
-  "port": 90001,
+  "db": "mongodb+srv://digimart_test:Just_Testing...@cluster0.ni0ol.mongodb.net/digimart_test",
+  "port": 9001,
   "Invitation": {
     "expirationDurationMs": 86400
   }
