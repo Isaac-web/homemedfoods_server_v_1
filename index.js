@@ -9,10 +9,11 @@ app.get("/api/ping", (req, res) => {
   res.send(`Connected to ${config.get("db")}`);
 });
 
-mongoose
-  .connect(config.get("db"))
-  .then(() => console.log(`Connected to ${process.env.app_db}...`))
-  .catch((err) => console.log("Could not connect to db..."));
+// mongoose
+//   .connect(config.get("db"))
+//   .then(() => console.log(`Connected to ${process.env.app_db}...`))
+//   .catch((err) => console.log("Could not connect to db..."));
+  
 const port = process.env.PORT || 5000;
 app.listen(5000, () => {console.log(`Listening on port ${port}...`)})
 
@@ -31,3 +32,4 @@ app.listen(5000, () => {console.log(`Listening on port ${port}...`)})
 // require("./startup/connections")(app);
 
 // module.exports = app;
+
