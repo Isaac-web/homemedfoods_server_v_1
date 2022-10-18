@@ -5,7 +5,7 @@ const config = require("config");
 const app = express();
 
 app.get("/api/ping", (req, res) => {
-  res.send("Pong");
+  res.send(`Connected to ${config.get("db")}`);
 });
 
 mongoose
