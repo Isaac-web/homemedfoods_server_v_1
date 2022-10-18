@@ -1,11 +1,17 @@
 const express = require("express");
+const mongoose = require("mongoose");
+const config = require("config");
 
 const app = express();
 
 app.get("/api/ping", (req, res) => {
   res.send("Pong");
-})
+});
 
+mongoose
+  .connect(config.get("db"))
+  .then(() => console.log(`Connected to ${config.get("db")}...`))
+  .catch((err) => console.log("Could not connect to db..."));
 const port = process.env.PORT || 5000;
 app.listen(5000, () => {console.log(`Listening on port ${port}...`)})
 
