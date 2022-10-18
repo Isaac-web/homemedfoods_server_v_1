@@ -9,9 +9,9 @@ app.get("/api/ping", (req, res) => {
   res.send(`Connected to ${config.get("db")}`);
 });
 
-// mongoose
-//   .connect(config.get("db"))
-//   .then(() => console.log(`Connected to ${process.env.app_db}...`))
+mongoose
+  .connect(config.get("db"))
+  .then(() => console.log(`Connected to ${process.env.app_db}...`));
 //   .catch((err) => console.log("Could not connect to db..."));
   
 const port = process.env.PORT || 5000;
