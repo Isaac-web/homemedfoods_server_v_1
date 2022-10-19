@@ -8,9 +8,7 @@ module.exports = (app) => {
   mongoose
     .connect(config.get("db"))
     .then(() => {
-      debugdb(
-        `mongodb+srv://digimart_test:Just_Testing...@cluster0.ni0ol.mongodb.net/digimart_test`
-      );
+      debugdb(`Connected to mongodb: ${config.get("db")}`);
       if (app.get("env") !== "test")
         app.listen(port, () => console.info(`Listening on port ${port}...`));
     })

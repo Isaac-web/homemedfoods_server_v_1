@@ -40,6 +40,11 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     defalut: null,
   },
+
+  confirmed_at: {
+    type: Date,
+    defalut: null,
+  },
   rider: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Employee",
@@ -117,6 +122,7 @@ const validateOnUpdate = (order) => {
     comment: Joi.string().max(500),
     riderId: Joi.objectId(),
     delivered_at: Joi.date(),
+    confirmed_at: Joi.date(),
   });
 
   return schema.validate(order);

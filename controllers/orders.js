@@ -72,6 +72,7 @@ const updateOrder = async (req, res) => {
   if (comment) order.comment = comment;
   if (delivered_at) order.delivered_at = delivered_at;
   if (riderId) order.rider = riderId;
+  if (confirmed_at) order.confirmed_at = confirmed_at;
 
   await order.save();
 

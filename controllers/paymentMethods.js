@@ -1,5 +1,9 @@
 const _ = require("lodash");
-const { PaymentMethod, validate } = require("../models/PaymentMethod");
+const {
+  PaymentMethod,
+  validate,
+  validateOnUpdate,
+} = require("../models/PaymentMethod");
 
 const createPaymentMethod = async (req, res) => {
   const { error } = validate(req.body);
@@ -13,7 +17,9 @@ const createPaymentMethod = async (req, res) => {
       .status(409)
       .send("Payment method with the given name already exists.");
 
-  const paymentMethod = new PaymentMethod(_.pick(req.body, ["name"]));
+  const paymentMethod = new PaymentMethod(
+    _.pick(req.body, ["name", "imageUri", "isActive"])
+  );
 
   await paymentMethod.save();
 
@@ -27,10 +33,13 @@ const getPaymentMethods = async (req, res) => {
 };
 
 const updatePaymentMethod = async (req, res) => {
+  const { error } = validateOnUpdate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
   const paymentMethod = await PaymentMethod.findByIdAndUpdate(
     req.params.id,
     {
-      $set: _.pick(req.body, ["name"]),
+      $set: _.pick(req.body, ["name", "imageUri", "isActive"]),
     },
     { new: true }
   );

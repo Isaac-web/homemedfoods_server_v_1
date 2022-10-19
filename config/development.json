@@ -1,4 +1,4 @@
 {
-  "db": "mongodb+srv://digimart_test:Just_Testing...@cluster0.ni0ol.mongodb.net/digimart_test",
+  "db": "mongodb://localhost/home_med_dev",
   "port": 9000
 }
