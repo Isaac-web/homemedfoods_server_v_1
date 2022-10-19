@@ -34,6 +34,11 @@ module.exports = (app) => {
   app.use("/api/products", products);
   app.use("/api/customers", customers);
 
+  // app.use((err, req, res, next) => {
+  //   console.log("An error occured...");
+  //   res.status(500).send("Something went wrong.");
+  // });
+
   // app.use("/api/cities", cities);
   // app.use("/api/stations", stations);
   // app.use("/api/invitations", invitations);

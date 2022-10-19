@@ -6,7 +6,7 @@ const PaymentMethod = mongoose.model(
   new mongoose.Schema({
     name: {
       type: String,
-      minlength: 3,
+      minlength: 5,
       maxlength: 50,
       trim: true,
       createIndex: true,
