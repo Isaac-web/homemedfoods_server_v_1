@@ -85,55 +85,77 @@ const getEmployee = async (req, res) => {
 };
 
 const updateEmployee = async (req, res) => {
-  const { error } = validateOnUpdate(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const employee = await Employee.findById(req.params.id)
-    .populate("branch")
-    .populate("designation");
+  const [designation, branch] = await Promise.all([
+    Designation.findById(req.body.designationId),
+    Branch.findById(req.body.branchId),
+  ]);
+
+  if (!designation) return res.status(404).send("Designation not found.");
+  if (!branch) return res.status(404).send("Branch not found.");
+
+  const employee = await Employee.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        middlename: req.body.middlename,
+        dateOfBirth: req.body.dateOfBirth,
+        email: req.body.email,
+        phone: req.body.phone,
+        salary: req.body.salary,
+        address: req.body.address,
+        designation: designation,
+        branch: branch,
+        digitalAddress: req.body.digitalAddress,
+      },
+    },
+    { new: true }
+  );
 
   if (!employee) return res.status(404).send("Employee not found.");
 
-  employee.set(
-    _.pick(req.body, [
-      "firstname",
-      "middlename",
-      "lastname",
-      "dateOfBirth",
-      "image",
-      "address",
-    ])
-  );
-
-  if (req.body.designationId) {
-    const designation = await Designation.findById(req.body.designationId);
-    if (!designation) return res.status(404).send("Desination not found.");
-
-    employee.designation = designation;
-  }
-
-  if (req.body.stationId) {
-    const station = await Station.findById(req.body.stationId);
-    if (!station) return res.status(404).send("Station not found.");
-
-    employee.station = station;
-  }
-
-  await employee.save();
-
-  employee.password = undefined;
   res.send(employee);
 };
 
 const deleteEmployee = async (req, res) => {
   let employee = Employee.findByIdAndRemove(req.params.id);
-  let invitation = Invitation.remove({ employeeId: req.params.id });
-
-  [employee] = await Promise.all([employee, invitation]);
-
   if (!employee) return res.status(404).send("Employee not found.");
-
   employee.password = undefined;
+  res.send(employee);
+};
+
+const createEmployee = async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const [designation, branch] = await Promise.all([
+    Designation.findById(req.body.designationId),
+    Branch.findById(req.body.branchId),
+  ]);
+
+  if (!designation) return res.status(404).send("Designation not found.");
+  if (!branch) return res.status(404).send("Branch not found.");
+
+  const employee = new Employee({
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    middlename: req.body.middlename,
+    dateOfBirth: req.body.dateOfBirth,
+    email: req.body.email,
+    phone: req.body.phone,
+    salary: req.body.salary,
+    address: req.body.address,
+    designation: designation,
+    branch: branch,
+    digitalAddress: req.body.digitalAddress,
+  });
+
+  await employee.save();
+
   res.send(employee);
 };
 
@@ -143,4 +165,5 @@ module.exports = {
   getEmployees,
   updateEmployee,
   deleteEmployee,
+  createEmployee,
 };

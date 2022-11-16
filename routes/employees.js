@@ -4,10 +4,10 @@ const validateId = require("../middleware/validateId");
 
 const router = express.Router();
 
-router.post("/register", controller.register);
+router.post("/new", controller.createEmployee);
 router.get("/", controller.getEmployees);
 router.get("/:id", [validateId], controller.getEmployee);
-router.patch("/:id", [validateId], controller.updateEmployee);
+router.put("/:id", [validateId], controller.updateEmployee);
 router.delete("/:id", [validateId], controller.deleteEmployee);
 
 module.exports = router;

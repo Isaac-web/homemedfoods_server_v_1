@@ -45,7 +45,6 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     minlength: 7,
     maxlength: 1024,
-    required: true,
   },
   address: {
     type: String,
@@ -65,6 +64,11 @@ const employeeSchema = new mongoose.Schema({
     createIndex: true,
     required: true,
     trim: true,
+  },
+  salary: {
+    type: Number,
+    min: 0,
+    required: true,
   },
   imageUri: {
     type: String,
@@ -100,6 +104,7 @@ employeeSchema.methods.verifyRequiredData = async function () {
     this.address &&
     this.phone &&
     this.station &&
+    this.salary &&
     this.designation;
 
   if (validData && this.verificationStage < 1) {
@@ -118,10 +123,12 @@ const validate = (employee) => {
     dateOfBirth: Joi.date().required(),
     email: Joi.string().min(0).max(256).required(),
     phone: Joi.string().min(3).max(15).required(),
+    salary: Joi.number().min(0).required(),
     address: Joi.string().max(256).required(),
+    designationId: Joi.string().required(),
+    imageUri: Joi.string().min(0),
+    branchId: Joi.string().required(),
     digitalAddress: Joi.string().max(100).required(),
-    password: Joi.string().min(7).max(256).required(),
-    confirmPassword: Joi.string().min(7).max(256).required(),
   });
 
   return schema.validate(employee);
@@ -137,6 +144,7 @@ const validateOnUpdate = (employee) => {
     designationId: Joi.objectId(),
     branchId: Joi.objectId(),
     phone: Joi.string().max(15),
+    salary: Joi.number().min(0).required(),
     address: Joi.object(),
     dateCommenced: Joi.date(),
     lastSeen: Joi.date(),
