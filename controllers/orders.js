@@ -1,6 +1,7 @@
 const { Branch } = require("../models/Branch");
 const { Order, validate, validateOnUpdate } = require("../models/Order");
 const { PaymentMethod } = require("../models/PaymentMethod");
+const { Product } = require("../models/Product");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -16,7 +17,11 @@ const createOrder = async (req, res) => {
 
   const orderItems = req.body.order_items.map((item) => ({
     product: item.productId,
+    productName: item.productName,
+    unitPrice: item.unitPrice,
+    imageUri: item.imageUri,
     quantity: item.quantity,
+    subtotal: item.unitPrice * item.quantity,
   }));
 
   const order = new Order({
@@ -38,6 +43,17 @@ const getOrders = async (req, res) => {
   let orders = await Order.find().populate("customer").populate("branch");
 
   res.send(orders);
+};
+
+const getOrder = async (req, res) => {
+  let order = await Order.findById(req.params.id)
+    .populate("customer")
+    .populate("branch")
+    .populate("payment_method");
+
+  if (!order) return res.status(404).send("Order not found.");
+
+  res.send(order);
 };
 
 const getCustomerOrders = async (req, res) => {
@@ -82,6 +98,7 @@ const updateOrder = async (req, res) => {
 module.exports = {
   createOrder,
   getOrders,
+  getOrder,
   updateOrderStatus,
   updateOrder,
   getCustomerOrders,

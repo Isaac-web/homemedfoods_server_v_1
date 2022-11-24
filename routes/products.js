@@ -1,5 +1,6 @@
 const express = require("express");
 const validateId = require("../middleware/validateId");
+const errorHandler = require("../middleware/routeErrorHandler");
 const {
   createProduct,
   getProducts,
@@ -11,7 +12,7 @@ const {
 const router = express.Router();
 
 router.post("/", createProduct);
-router.get("/", getProducts);
+router.get("/", errorHandler(getProducts));
 router.get("/:id", [validateId], getProduct);
 router.patch("/:id", [validateId], updateProduct);
 router.delete("/:id", [validateId], deleteProduct);

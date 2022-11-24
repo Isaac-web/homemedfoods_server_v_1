@@ -3,6 +3,8 @@ const { Product, validate, validateOnUpdate } = require("../models/Product");
 const { ProductCategory } = require("../models/ProductCategory");
 const { Discount } = require("../models/Discount");
 const validateObjectId = require("../utils/validateObjectId");
+const uploader = require("../utils/uploader");
+const routeErrorHandler = require("../middleware/routeErrorHandler");
 
 const createProduct = async (req, res) => {
   const { error } = validate(req.body);
@@ -14,7 +16,8 @@ const createProduct = async (req, res) => {
     desc: req.body.desc,
     category: req.body.categoryId,
     price: req.body.price,
-    imageUri: req.body.imageUri,
+    "image.url": req.body?.imageUri,
+    "image.public_id": req.body?.imagePublicId,
     status: req.body.status,
     discount: req.body.discountId,
   });
@@ -33,6 +36,7 @@ const getProducts = async (req, res) => {
     .populate("category", "name desc")
     .populate("discount");
 
+  throw new Error("Something went wrong.");
   res.send(products);
 };
 
@@ -50,28 +54,35 @@ const updateProduct = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const product = await Product.findByIdAndUpdate(
-    req.params.id,
-    {
-      $set: {
-        name: req.body.name,
-        desc: req.body.desc,
-        category: req.body.categoryId,
-        price: req.body.price,
-        imageUri: req.body.imageUri,
-        status: req.body.status,
-        discount: req.body?.discountId,
-      },
-    },
-    { new: true }
-  );
+  let product = await Product.findById(req.params.id);
+  if (!product) return res.status(404).send("Product not found.");
 
+  if (product?.image?.url) {
+    if (product.image.url !== req.body.imageUri)
+      await uploader.deleteFile(product.image.public_id);
+  }
+
+  product.name = req.body.name;
+  product.desc = req.body.desc;
+  product.category = req.body.categoryId;
+  product.price = req.body.price;
+  product.image.url = req.body.imageUri;
+  product.image.public_id = req.body?.imagePublicId;
+  product.status = req.body.status;
+  product.discount = req.body?.discountId;
+
+  await product.save();
   return res.send(product);
 };
 
 const deleteProduct = async (req, res) => {
-  let product = await Product.findByIdAndRemove(req.params.id);
+  let product = await Product.findById(req.params.id);
   if (!product) return res.status(404).send("Product not found.");
+
+  if (product?.image?.public_id)
+    await uploader.deleteFile(product?.image?.public_id);
+
+  product.remove();
 
   res.send(product);
 };

@@ -122,11 +122,12 @@ const updateEmployee = async (req, res) => {
 };
 
 const deleteEmployee = async (req, res) => {
-  let employee = Employee.findByIdAndRemove(req.params.id);
-  if (!employee) return res.status(404).send("Employee not found.");
-  employee.password = undefined;
+  const employee = await Employee.findByIdAndRemove(req.params.id)
+  
+  if(!employee) return res.status(404).send("Employee not found.");
+
   res.send(employee);
-};
+};;
 
 const createEmployee = async (req, res) => {
   const { error } = validate(req.body);

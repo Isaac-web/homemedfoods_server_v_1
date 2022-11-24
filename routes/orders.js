@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post("/", [customerAuth], controller.createOrder);
 router.get("/", controller.getOrders);
+router.get("/:id", [validateId], controller.getOrder); //todo: add valiation
 router.get("/customer", [customerAuth], controller.getCustomerOrders)
 router.patch("/:id/status", [validateId], controller.updateOrderStatus);
 router.patch("/:id", [validateId], controller.updateOrder);

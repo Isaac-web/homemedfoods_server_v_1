@@ -27,9 +27,9 @@ const productSchema = new mongoose.Schema({
     max: 1000,
     required: true,
   },
-  imageUri: {
-    type: String,
-    maxlength: 1024,
+  image: {
+    url: String,
+    public_id: String,
   },
   status: {
     type: Boolean,
@@ -50,6 +50,7 @@ const validate = (product) => {
     categoryId: Joi.objectId().required(),
     price: Joi.number().min(0).max(1000).required(),
     imageUri: Joi.string().max(1024),
+    imagePublicId: Joi.string().max(1024),
     status: Joi.boolean().default(true),
     discountId: Joi.objectId(),
   });

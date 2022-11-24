@@ -19,12 +19,12 @@ const Branch = mongoose.model(
     address: {
       city: {
         type: String,
-        required: true,
+        required: false,
         maxlength: 100,
       },
       area: {
         type: String,
-        required: true,
+        required: false,
         maxlength: 100,
       },
       coordinates: {
@@ -38,9 +38,9 @@ const Branch = mongoose.model(
 const validate = (branch) => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(100).required(),
-    description: Joi.string().max(500),
-    city: Joi.string().max(100).required(),
-    area: Joi.string().max(100).required(),
+    description: Joi.string().min(0).max(500),
+    city: Joi.string().max(100),
+    area: Joi.string().max(100),
     coordinates: Joi.object({
       lat: Joi.number(),
       long: Joi.number(),
@@ -54,8 +54,8 @@ const validateOnUpdate = (branch) => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(100),
     description: Joi.string().max(500),
-    city: Joi.string().max(100),
-    area: Joi.string().max(100),
+    city: Joi.string().min(0).max(100),
+    area: Joi.string().min(0).max(100),
     coordinates: Joi.object({
       lat: Joi.number(),
       long: Joi.number(),
