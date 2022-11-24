@@ -7,11 +7,12 @@ const {
 } = require("../controllers/addresses");
 const customerAuth = require("../middleware/customerAuth");
 const validateId = require("../middleware/validateId");
+const errorHandler = require("../middleware/routeErrorHandler");
 
 const router = express.Router();
-router.post("/", [customerAuth], createAddress);
-router.get("/", [customerAuth], getAddresses);
-router.patch("/:id", [validateId, customerAuth], updateAddress);
-router.delete("/:id", [validateId, customerAuth], deleteAddress);
+router.post("/", [customerAuth], errorHandler(createAddress));
+router.get("/", [customerAuth], errorHandler(getAddresses));
+router.patch("/:id", [validateId, customerAuth], errorHandler(updateAddress));
+router.delete("/:id", [validateId, customerAuth], errorHandler(deleteAddress));
 
 module.exports = router;
