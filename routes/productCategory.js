@@ -7,12 +7,13 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../controllers/productCategory");
+const errorHandler = require("../middleware/routeErrorHandler");
 
 const router = express.Router();
-router.post("/", createProductCategory);
-router.get("/", getAllCategories);
-router.get("/:id", [validateId], getCategory);
-router.patch("/:id", [validateId], updateCategory);
-router.delete("/:id", [validateId], deleteCategory);
+router.post("/", errorHandler(createProductCategory));
+router.get("/", errorHandler(getAllCategories));
+router.get("/:id", [validateId], errorHandler(getCategory));
+router.patch("/:id", [validateId], errorHandler(updateCategory));
+router.delete("/:id", [validateId], errorHandler(deleteCategory));
 
 module.exports = router;
