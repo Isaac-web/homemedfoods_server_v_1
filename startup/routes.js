@@ -11,10 +11,6 @@ const cartItems = require("../routes/cartItems");
 const branches = require("../routes/branches");
 const invitations = require("./../routes/invitations");
 
-// const cities = require("./../routes/cities");
-// const stations = require("./../routes/stations");
-// const employees = require("./../routes/employees");
-// const customerAddresses = require("./../routes/customerAddresses");
 
 module.exports = (app) => {
   app.get("/ping", (req, res) => {
@@ -33,16 +29,4 @@ module.exports = (app) => {
   app.use("/api/payment-methods", paymentMethods);
   app.use("/api/products", products);
   app.use("/api/customers", customers);
-
-  // app.use((err, req, res, next) => {
-  //   console.log("An error occured...");
-  //   res.status(500).send("Something went wrong.");
-  // });
-
-  // app.use("/api/cities", cities);
-  // app.use("/api/stations", stations);
-  // app.use("/api/invitations", invitations);
-  // app.use("/api/designations", designations);
-  // app.use("/api/employees", employees);
-  // app.use("/api/customers/addresses", customerAddresses);
 };
