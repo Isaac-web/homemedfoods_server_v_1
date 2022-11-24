@@ -1,11 +1,12 @@
 const express = require("express");
 const controller = require("../controllers/paymentMethods");
 const validateId = require("../middleware/validateId");
+const errorHandler = require("../middleware/routeErrorHandler");
 
 const router = express.Router();
 
-router.post("/", controller.createPaymentMethod);
-router.get("/", controller.getPaymentMethods);
-router.patch("/:id", [validateId], controller.updatePaymentMethod);
-router.delete("/:id", [validateId], controller.deletePaymentMethod);
+router.post("/", errorHandler(controller.createPaymentMethod));
+router.get("/", errorHandler(controller.getPaymentMethods));
+router.patch("/:id", [validateId], errorHandler(controller.updatePaymentMethod));
+router.delete("/:id", [validateId], errorHandler(controller.deletePaymentMethod));
 module.exports = router;
