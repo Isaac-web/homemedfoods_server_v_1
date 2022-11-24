@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { Customer, validate, validateAuth } = require("../models/Customer");
 const {ShoppingCart} = require("../models/ShoppingCart");
 
+
 const register = async (req, res) => {
   //For now, email customer will be logged in automatically
   //without having to verify his/her email
