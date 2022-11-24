@@ -35,8 +35,6 @@ const getProducts = async (req, res) => {
   const products = await Product.find()
     .populate("category", "name desc")
     .populate("discount");
-
-  throw new Error("Something went wrong.");
   res.send(products);
 };
 
