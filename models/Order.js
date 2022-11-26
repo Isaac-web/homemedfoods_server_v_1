@@ -6,6 +6,8 @@ const { orderItemSchema } = require("../models/OrderItem");
 
 const deliveryAddressSchema = new mongoose.Schema({
   coordinates: {
+    city: { type: String, min: 2, max: 100 },
+    area: { type: String, min: 2, max: 100 },
     lat: { type: Number, required: true },
     long: { type: Number, required: true },
   },
@@ -80,9 +82,20 @@ const orderSchema = new mongoose.Schema(
       ref: "PaymentMethod",
       required: true,
     },
+    subtotal: {
+      type: Number,
+      min: 0,
+      required: true,
+    },
+    deliveryFee: {
+      type: Number,
+      min: 0,
+      required: true,
+    },
     total: {
       type: Number,
       min: 0,
+      default: this.subtotal + this.deliveryFee,
       validate: {
         validator: function (total) {
           return total > 0;
@@ -117,10 +130,14 @@ const validate = (order) => {
       .required(),
     delivery_address: Joi.object({
       coordinates: Joi.object({
+        city: Joi.string().max(100),
+        area: Joi.string().max(100),
         lat: Joi.number().required(),
         long: Joi.number().required(),
       }),
     }).required(),
+    subtotal: Joi.number().min(0).required(),
+    deliveryFee: Joi.number().min(0).required(),
     branch: Joi.objectId().required(),
     payment_method_id: Joi.objectId().required(),
     total: Joi.number().min(0).greater(0),

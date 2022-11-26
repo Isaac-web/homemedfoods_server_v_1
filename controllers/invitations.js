@@ -1,6 +1,5 @@
 const config = require("config");
 const { Invitation, validate } = require("../models/Invitation");
-const { Station } = require("../models/Station");
 const { Branch } = require("../models/Branch");
 const { Employee } = require("../models/Employee");
 const { Designation } = require("../models/Designation");

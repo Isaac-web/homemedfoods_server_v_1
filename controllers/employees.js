@@ -1,9 +1,10 @@
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const config = require("config");
 const moment = require("moment");
 const { Employee, validate, validateOnUpdate } = require("../models/Employee");
 const { Invitation } = require("../models/Invitation");
-const { Station } = require("../models/Station");
 const { Branch } = require("../models/Branch");
 const { Designation } = require("../models/Designation");
 
@@ -58,11 +59,11 @@ const register = async (req, res) => {
   [branch, designation] = await Promise.all([branch, designation]);
   employee.branch = branch;
   employee.designation = designation;
-  
+
   await employee.save();
 
   // remove password from response body
-  employee.password = undefined; 
+  employee.password = undefined;
   res.send(employee);
 };
 
@@ -122,12 +123,12 @@ const updateEmployee = async (req, res) => {
 };
 
 const deleteEmployee = async (req, res) => {
-  const employee = await Employee.findByIdAndRemove(req.params.id)
-  
-  if(!employee) return res.status(404).send("Employee not found.");
+  const employee = await Employee.findByIdAndRemove(req.params.id);
+
+  if (!employee) return res.status(404).send("Employee not found.");
 
   res.send(employee);
-};;
+};
 
 const createEmployee = async (req, res) => {
   const { error } = validate(req.body);
@@ -160,6 +161,23 @@ const createEmployee = async (req, res) => {
   res.send(employee);
 };
 
+const login = async (req, res) => {
+  const employee = await Employee.findOne({ email: req.body.email });
+  if (!employee) return res.status(400).send("Invalid username");
+
+  const payload = {
+    _id: employee._id,
+    name: `${employee.firstname} ${employee.lastname}`,
+    email: employee.email,
+    designationId: employee.designation,
+    branchId: employee.branch,
+  };
+
+  const token = jwt.sign(payload, config.get("auth.privateKey"));
+
+  res.send(token);
+};
+
 module.exports = {
   register,
   getEmployee,
@@ -167,4 +185,5 @@ module.exports = {
   updateEmployee,
   deleteEmployee,
   createEmployee,
+  login,
 };

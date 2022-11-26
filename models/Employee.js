@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid");
-const { Address } = require("./Address");
-const { addressSchema } = require("./Address");
 
 
 //address, digital address, imageUri, branch

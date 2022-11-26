@@ -1,7 +1,6 @@
 const { Branch } = require("../models/Branch");
 const { Order, validate, validateOnUpdate } = require("../models/Order");
 const { PaymentMethod } = require("../models/PaymentMethod");
-const { Product } = require("../models/Product");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -31,7 +30,9 @@ const createOrder = async (req, res) => {
     delivery_address: req.body.delivery_address,
     branch: branch,
     payment_method: paymentMethod,
-    total: req.body.total,
+    subtotal: req.body.subtotal,
+    deliveryFee: req.body.deliveryFee,
+    total: req.body.subtotal + req.body.deliveryFee,
   });
 
   await order.save();
@@ -41,6 +42,15 @@ const createOrder = async (req, res) => {
 
 const getOrders = async (req, res) => {
   let orders = await Order.find().populate("customer").populate("branch");
+
+  res.send(orders);
+};
+
+const getBranchOrders = async (req, res) => {
+  const { branch } = req.employee;
+  let orders = await Order.find({ branch })
+    .populate("customer")
+    .populate("branch");
 
   res.send(orders);
 };
@@ -95,11 +105,36 @@ const updateOrder = async (req, res) => {
   res.send(order);
 };
 
+const updateOnOpen = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).send("Order not found.");
+
+  order.status.value = 1;
+  order.status.update_at = Date.now();
+  res.send(order.status);
+
+  //todo: send notification
+};
+
+const dispatchOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).send("Order not found.");
+
+  order.rider = req.body.riderId;
+  order.status.value = 2;
+  order.status.update_at = Date.now();
+
+  res.send(order);
+};
+
 module.exports = {
   createOrder,
+  dispatchOrder,
+  getBranchOrders,
   getOrders,
   getOrder,
   updateOrderStatus,
   updateOrder,
   getCustomerOrders,
+  updateOnOpen,
 };
