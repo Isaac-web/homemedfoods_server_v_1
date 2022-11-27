@@ -59,8 +59,16 @@ const deleteCategory = async (req, res) => {
   res.send(category);
 };
 
+const searchCategory = async (req, res) => {
+  const searchString = new RegExp(req.query.q, "i");
+
+  const searchResults = await ProductCategory.find({ name: searchString });
+  return res.send(searchResults);
+};
+
 exports.createProductCategory = createProductCategory;
 exports.getAllCategories = getAllCategories;
 exports.getCategory = getCategory;
 exports.updateCategory = updateCategory;
 exports.deleteCategory = deleteCategory;
+exports.searchCategory = searchCategory;
