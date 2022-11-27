@@ -48,6 +48,17 @@ const getProduct = async (req, res) => {
   res.send(product);
 };
 
+const searchProduct = async (req, res) => {
+  console.log(req.query);
+  const searchString = new RegExp(req.query.q, "i");
+
+  const searchResult = await Product.find({ name: searchString })
+    .populate("category", "name desc")
+    .populate("discount", "name discountPercent");
+
+  res.send(searchResult);
+};
+
 const updateProduct = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -90,3 +101,4 @@ exports.getProducts = getProducts;
 exports.getProduct = getProduct;
 exports.updateProduct = updateProduct;
 exports.deleteProduct = deleteProduct;
+exports.searchProduct = searchProduct;
