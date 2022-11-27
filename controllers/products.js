@@ -49,7 +49,6 @@ const getProduct = async (req, res) => {
 };
 
 const searchProduct = async (req, res) => {
-  console.log(req.query);
   const searchString = new RegExp(req.query.q, "i");
 
   const searchResult = await Product.find({ name: searchString })
