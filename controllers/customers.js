@@ -1,8 +1,12 @@
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
-const { Customer, validate, validateAuth } = require("../models/Customer");
-const {ShoppingCart} = require("../models/ShoppingCart");
-
+const {
+  Customer,
+  validate,
+  validateAuth,
+  validateOnUpdate,
+} = require("../models/Customer");
+const { ShoppingCart } = require("../models/ShoppingCart");
 
 const register = async (req, res) => {
   //For now, email customer will be logged in automatically
@@ -57,7 +61,44 @@ const login = async (req, res) => {
   res.json({ token });
 };
 
+const getCustomers = async (req, res) => {
+  const customers = await Customer.find();
+
+  res.send(customers);
+};
+
+const getCustomer = async (req, res) => {
+  const customer = await Customer.findById(req.params.id);
+  if (!customer) return res.status(404).send("Customer not found.");
+
+  res.send(customer);
+};
+
+const updateCustomer = async (req, res) => {
+  const { error } = validateOnUpdate(req.body);
+  if (error) return res.status(404).send(error.details[0].message);
+
+  const customer = await Customer.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        phone: req.body.phone,
+      },
+    },
+    { new: true }
+  );
+
+  if (!customer) return res.status(404).send("Customer not found.");
+
+  res.send(customer);
+};
+
 module.exports = {
+  getCustomers,
+  getCustomer,
+  updateCustomer,
   register,
   login,
 };

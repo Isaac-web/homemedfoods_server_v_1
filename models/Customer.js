@@ -43,6 +43,11 @@ const customerSchema = new mongoose.Schema({
     maxlength: 1024,
     required: true,
   },
+  points: {
+    type: Number,
+    min: 0,
+    default: 0,
+  },
 });
 
 customerSchema.methods.generateAuthToken = function () {
@@ -64,6 +69,17 @@ const validate = (customer) => {
   return schema.validate(customer);
 };
 
+const validateOnUpdate = (customer) => {
+  const schema = Joi.object({
+    firstname: Joi.string().min(2).max(100).required(),
+    lastname: Joi.string().min(2).max(100).required(),
+    email: Joi.string().email().min(0).max(100),
+    phone: Joi.string().min(3).max(15).required(),
+  });
+
+  return schema.validate(customer);
+};
+
 const validateAuth = (user) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
@@ -73,7 +89,7 @@ const validateAuth = (user) => {
   return schema.validate(user);
 };
 
-
 module.exports.validate = validate;
+module.exports.validateOnUpdate = validateOnUpdate;
 module.exports.validateAuth = validateAuth
 module.exports.Customer = Customer;

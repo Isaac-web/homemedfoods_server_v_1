@@ -12,7 +12,6 @@ const createProductCategory = async (req, res) => {
 
   const category = new ProductCategory(_.pick(req.body, ["name", "desc"]));
   await category.save();
-
   res.send(category);
 };
 
