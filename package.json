@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Isaac-web/homemedfoods_server_v_1#readme",
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.32.0",
