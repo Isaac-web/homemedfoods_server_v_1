@@ -5,29 +5,25 @@ const {
   validateOnUpdate,
 } = require("../models/PaymentMethod");
 
-const createPaymentMethod = async (req, res, next) => {
-  try {
-    const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+const createPaymentMethod = async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
-    const existingPaymentMethod = await PaymentMethod.findOne({
-      name: req.body.name,
-    }).count();
-    if (existingPaymentMethod)
-      return res
-        .status(409)
-        .send("Payment method with the given name already exists.");
+  const existingPaymentMethod = await PaymentMethod.findOne({
+    name: req.body.name,
+  }).count();
+  if (existingPaymentMethod)
+    return res
+      .status(409)
+      .send("Payment method with the given name already exists.");
 
-    const paymentMethod = new PaymentMethod(
-      _.pick(req.body, ["name", "imageUri", "isActive"])
-    );
+  const paymentMethod = new PaymentMethod(
+    _.pick(req.body, ["name", "imageUri", "isActive"])
+  );
 
-    await paymentMethod.save();
+  await paymentMethod.save();
 
-    res.send(paymentMethod);
-  } catch (err) {
-    next(err);
-  }
+  res.send(paymentMethod);
 };
 
 const getPaymentMethods = async (req, res) => {
