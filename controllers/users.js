@@ -13,6 +13,8 @@ const { Designation } = require("../models/Designation");
 const createUser = async (req, res) => {
   const userCount = await User.find().count();
 
+  console.log(req.body);
+
   const isSystemUser = !userCount || req.query.userType === "system";
   const { error } = isSystemUser
     ? validateSystemUser(req.body)
