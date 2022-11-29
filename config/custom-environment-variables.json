@@ -2,5 +2,10 @@
   "auth": {
     "privateKey": "app_auth_private_key"
   },
-  "db": "app_db"
+  "db": "app_db_url",
+  "cloudinary": {
+    "api_key": "cloudinary_api_key",
+    "api_secret": "cloudinary_api_secret",
+    "cloud_name": "cloudinary_cloud_name"
+  }
 }

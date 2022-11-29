@@ -1,7 +1,9 @@
 const express = require("express");
 const { createServer } = require("http");
+const config = require("config");
 
 const app = express();
+
 app.get("/ping", (req, res) => {
   res.send("Pong");
 });
@@ -12,6 +14,9 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (err) => {
   throw new Error(err);
 });
+
+if (app.get("env") === "production" && !config.get("auth.privateKey"))
+  throw new Error("jwt privkate key not provided.");
 
 const httpServer = createServer(app);
 app.get("/", (req, res) => {

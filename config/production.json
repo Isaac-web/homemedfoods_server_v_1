@@ -1,9 +1,9 @@
 {
   "db": "mongodb+srv://digimart_test:Just_Testing...@cluster0.ni0ol.mongodb.net/digimart_test",
   "auth": {
-    "privateKey": "Insecure Private Key"
+    "privateKey": ""
   },
-  "port": 9001,
+  "port": 9000,
   "Invitation": {
     "expirationDurationMs": 86400
   }

@@ -26,8 +26,9 @@ module.exports = (privilege) => {
       ]);
 
       if (user.userType == "system") return next();
+      console.log(privilege === "system" && user.userType !== "system");
       if (privilege === "system" && user.userType !== "system")
-        return res.send("Access denied.");
+        return res.status(403).send("Access denied.");
 
       const designationValue = privileges[designation.value];
       if (designationValue < privilegeValue)
