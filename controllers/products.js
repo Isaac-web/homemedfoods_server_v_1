@@ -1,8 +1,8 @@
 const _ = require("lodash");
 const { Product, validate, validateOnUpdate } = require("../models/Product");
 const { ProductCategory } = require("../models/ProductCategory");
-const { Discount } = require("../models/Discount");
 const uploader = require("../utils/uploader");
+const validateObjectId = require("../utils/validateObjectId");
 
 const createProduct = async (req, res) => {
   const { error } = validate(req.body);
@@ -31,7 +31,13 @@ const createProduct = async (req, res) => {
 };
 
 const getProducts = async (req, res) => {
-  const products = await Product.find()
+  const { categoryId } = req.query;
+
+  //query object
+  const filter = {};
+  if (categoryId && validateObjectId(categoryId)) filter.category = categoryId;
+
+  const products = await Product.find(filter)
     .populate("category", "name desc")
     .populate("discount");
   res.send(products);
