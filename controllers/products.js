@@ -33,15 +33,14 @@ const createProduct = async (req, res) => {
 const getProducts = async (req, res) => {
   const { categoryId } = req.query;
 
-  //query object
-  const filter = {};
+  const filter = {}; //query object
   if (categoryId && validateObjectId(categoryId)) filter.category = categoryId;
 
   const products = await Product.find(filter)
     .populate("category", "name desc")
     .populate("discount");
   res.send(products);
-};
+};;
 
 const getProduct = async (req, res) => {
   const product = await Product.findById(req.params.id)

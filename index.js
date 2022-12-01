@@ -4,10 +4,6 @@ const config = require("config");
 
 const app = express();
 
-app.get("/ping", (req, res) => {
-  res.send("Pong");
-});
-
 process.on("uncaughtException", (err) => {
   console.log(err.message, err);
 });
@@ -19,9 +15,10 @@ if (app.get("env") === "production" && !config.get("auth.privateKey"))
   throw new Error("jwt privkate key not provided.");
 
 const httpServer = createServer(app);
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+app.get("/ping", (req, res) => {
+  res.send("Pong");
 });
+
 require("./startup/middleware")(app);
 require("./startup/routes")(app);
 require("./startup/connections")(httpServer);
@@ -33,16 +30,26 @@ const io = require("socket.io")(httpServer, {
   },
 });
 
-module.exports.ioHandler = (io) => {
-  console.log("1 person connected.");
+let usersOnline = [];
+const addUserOnline = (userId, socketId) => {
+  const index = usersOnline.findIndex((user) => user.userId === userId);
+  if (index == -1) {
+    usersOnline.push({ userId, socketId });
+  }
+};
+
+const removeUserOnline = (socketId) => {
+  usersOnline = usersOnline.filter((user) => user.socketId !== socketId);
 };
 
 io.on("connection", (socket) => {
-  console.log("1 User connected...");
+  socket.on("userOnline", ({ userId }) => {
+    addUserOnline(userId, socket.id);
+  });
+  socket.on("disconnect", () => removeUserOnline(socket.id));
 });
 
-io.on("firstEvent", () => {
-  console.log("There was an event...");
-});
+app.set("io", io);
 
 module.exports = app;
+

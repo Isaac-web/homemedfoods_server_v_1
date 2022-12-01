@@ -37,6 +37,9 @@ const createOrder = async (req, res) => {
 
   await order.save();
 
+  const io = req.app.get("io");
+  io.emit("newOrder", JSON.stringify(order));
+
   res.send(order);
 };
 

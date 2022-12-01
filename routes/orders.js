@@ -29,6 +29,6 @@ router.get("/:id", [validateId], errorHandler(controller.getOrder)); //todo: add
 router.patch("/:id/dispatch", [validateId], errorHandler(controller.dispatchOrder));
 router.patch("/:id/opened", [validateId], errorHandler(controller.updateOnOpen));
 router.patch("/:id", [validateId], errorHandler(controller.updateOrder));
-router.delete("/", errorHandler(orders)); //Todo: Only the admin should be able to delete the order
+router.delete("/", errorHandler(orders)); //Todo: Only an admin should be able to delete the order
 
 module.exports = router;
