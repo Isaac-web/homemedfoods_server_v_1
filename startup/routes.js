@@ -8,6 +8,7 @@ const productCategory = require("./../routes/productCategory");
 const designations = require("./../routes/designations");
 const branches = require("../routes/branches");
 const users = require("./../routes/users");
+const recipeCategories = require("./../routes/recipeCategories");
 
 module.exports = (app) => {
   app.get("/ping", (req, res) => {
@@ -24,4 +25,5 @@ module.exports = (app) => {
   app.use("/api/products", products);
   app.use("/api/customers", customers);
   app.use("/api/users", users);
+  app.use("/api/recipe_categories", recipeCategories);
 };

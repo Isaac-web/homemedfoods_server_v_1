@@ -20,16 +20,13 @@ module.exports = (privilege) => {
     try {
       const decode = jwt.verify(token, config.get("auth.privateKey"));
 
-      const [user, designation] = await Promise.all([
-        User.findById(decode._id),
-        Designation.findById(decode.designationId),
-      ]);
-
+      const user = await User.findById(decode._id);
       if (user.userType == "system") return next();
-      console.log(privilege === "system" && user.userType !== "system");
+
       if (privilege === "system" && user.userType !== "system")
         return res.status(403).send("Access denied.");
 
+      const designation = Designation.findById(user.designation);
       const designationValue = privileges[designation.value];
       if (designationValue < privilegeValue)
         return res.status(403).send("Access Denied.");
