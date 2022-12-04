@@ -15,6 +15,8 @@ const createProduct = async (req, res) => {
     category: req.body.categoryId,
     price: req.body.price,
     unit: req.body.unit,
+    priceFixed: req.body.priceFixed,
+    available: req.body.available,
     "image.url": req.body?.imageUri,
     "image.public_id": req.body?.imagePublicId,
     status: req.body.status,
@@ -40,7 +42,7 @@ const getProducts = async (req, res) => {
     .populate("category", "name desc")
     .populate("discount");
   res.send(products);
-};;
+};
 
 const getProduct = async (req, res) => {
   const product = await Product.findById(req.params.id)
@@ -83,6 +85,8 @@ const updateProduct = async (req, res) => {
   product.category = req.body.categoryId;
   product.price = req.body.price;
   product.unit = req.body.unit;
+  product.available = req.body.available;
+  product.priceFixed = req.body.priceFixed;
   product.image.public_id = req.body?.imagePublicId;
   product.status = req.body.status;
   product.discount = req.body?.discountId;
@@ -101,7 +105,7 @@ const deleteProduct = async (req, res) => {
     try {
       await uploader.deleteFile(product?.image?.public_id);
     } catch (error) {
-      return res.status(500).send("Oops. Could not delete product.");
+      return res.status(500).send("Oops... Could not delete product.");
     }
   }
 

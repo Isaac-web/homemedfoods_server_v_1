@@ -14,13 +14,17 @@ const createOrder = async (req, res) => {
   if (!branch) return res.status(404).send("Branch not found.");
   if (!paymentMethod) return res.status(404).send("Payment method not found.");
 
+  let orderItemsTotal = 0;
   const orderItems = req.body.order_items.map((item) => ({
-    product: item.productId,
+    productId: item.productId,
     productName: item.productName,
+    optionalPrice: item.optionalPrice,
     unitPrice: item.unitPrice,
     imageUri: item.imageUri,
     quantity: item.quantity,
-    subtotal: item.unitPrice * item.quantity,
+    subtotal: (orderItemsTotal += item.optionalPrice
+      ? item.optionalPrice * item.quantity
+      : item.unitPrice * item.quantity),
   }));
 
   const order = new Order({
@@ -30,9 +34,9 @@ const createOrder = async (req, res) => {
     delivery_address: req.body.delivery_address,
     branch: branch,
     payment_method: paymentMethod,
-    subtotal: req.body.subtotal,
+    subtotal: orderItemsTotal,
     deliveryFee: req.body.deliveryFee,
-    total: req.body.subtotal + req.body.deliveryFee,
+    total: orderItemsTotal + req.body.deliveryFee,
   });
 
   await order.save();
@@ -51,11 +55,28 @@ const getOrders = async (req, res) => {
 
 const getBranchOrders = async (req, res) => {
   const { branch } = req.employee;
-  let orders = await Order.find({ branch })
-    .populate("customer")
-    .populate("branch");
 
-  res.send(orders);
+  const pageSize = req.query.pageSize || 10;
+  const currentPage = req.query.currentPage || 0;
+
+  let [orders, ordersCount] = await Promise.all([
+    Order.find({ branch })
+      .populate("customer")
+      .populate("branch")
+      .skip(currentPage)
+      .limit(pageSize),
+    Order.find({ branch }).count(),
+  ]);
+
+  res.send({ pageSize, orders, ordersCount, currentPage });
+};
+
+const getBranchPendingOrders = async (req, res) => {
+  const { branch } = req.employee;
+
+  let pendingOrders = await Order.find({ branch, "status.value": 0 }).count();
+
+  res.send({ pendingOrders: pendingOrders });
 };
 
 const getOrder = async (req, res) => {
@@ -140,4 +161,5 @@ module.exports = {
   updateOrder,
   getCustomerOrders,
   updateOnOpen,
+  getBranchPendingOrders,
 };

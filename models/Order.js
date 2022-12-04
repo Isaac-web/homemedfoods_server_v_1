@@ -107,10 +107,6 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-orderSchema.method.updateStatus = function () {
-  console.log("update...");
-};
-
 const Order = mongoose.model("Order", orderSchema);
 
 const validate = (order) => {
@@ -122,7 +118,8 @@ const validate = (order) => {
         Joi.object({
           productId: Joi.objectId().required(),
           productName: Joi.string().required(),
-          unitPrice: Joi.number().required(),
+          unitPrice: Joi.number(),
+          optionalPrice: Joi.number(),
           imageUri: Joi.string().min(0).max(1028),
           quantity: Joi.number().min(1),
         })
@@ -136,7 +133,6 @@ const validate = (order) => {
         long: Joi.number().required(),
       }),
     }).required(),
-    subtotal: Joi.number().min(0).required(),
     deliveryFee: Joi.number().min(0).required(),
     branch: Joi.objectId().required(),
     payment_method_id: Joi.objectId().required(),

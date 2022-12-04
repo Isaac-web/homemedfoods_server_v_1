@@ -9,7 +9,7 @@ const auth = require("../middleware/auth");
 const router = express.Router();
 
 router.post("/", [customerAuth], errorHandler(controller.createOrder));
-router.get("/", errorHandler(controller.getOrders));
+router.get("/", auth("admin"), errorHandler(controller.getOrders));
 router.get(
   "/customer",
   [customerAuth],
@@ -20,6 +20,13 @@ router.get(
   auth("mananger"),
   errorHandler(controller.getBranchOrders)
 );
+
+router.get(
+  "/branch/pending",
+  auth("mananger"),
+  errorHandler(controller.getBranchPendingOrders)
+);
+
 router.patch(
   "/:id/status",
   [validateId],

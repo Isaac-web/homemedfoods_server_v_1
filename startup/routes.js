@@ -9,6 +9,7 @@ const designations = require("./../routes/designations");
 const branches = require("../routes/branches");
 const users = require("./../routes/users");
 const recipeCategories = require("./../routes/recipeCategories");
+const recipes = require("../routes/recipes");
 
 module.exports = (app) => {
   app.get("/ping", (req, res) => {
@@ -26,4 +27,5 @@ module.exports = (app) => {
   app.use("/api/customers", customers);
   app.use("/api/users", users);
   app.use("/api/recipe_categories", recipeCategories);
+  app.use("/api/recipes", recipes);
 };

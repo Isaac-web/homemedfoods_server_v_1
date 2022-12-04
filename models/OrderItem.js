@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const orderItemSchema = new mongoose.Schema({
-  product: {
+  productId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
     required: true,
@@ -12,7 +12,11 @@ const orderItemSchema = new mongoose.Schema({
   },
   unitPrice: {
     type: Number,
-    required: true,
+    min: 0,
+  },
+  optionalPrice: {
+    type: Number,
+    min: 0,
   },
   imageUri: {
     type: String,
