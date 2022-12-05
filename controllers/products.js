@@ -16,7 +16,6 @@ const createProduct = async (req, res) => {
     price: req.body.price,
     unit: req.body.unit,
     priceFixed: req.body.priceFixed,
-    available: req.body.available,
     "image.url": req.body?.imageUri,
     "image.public_id": req.body?.imagePublicId,
     status: req.body.status,
@@ -85,7 +84,6 @@ const updateProduct = async (req, res) => {
   product.category = req.body.categoryId;
   product.price = req.body.price;
   product.unit = req.body.unit;
-  product.available = req.body.available;
   product.priceFixed = req.body.priceFixed;
   product.image.public_id = req.body?.imagePublicId;
   product.status = req.body.status;

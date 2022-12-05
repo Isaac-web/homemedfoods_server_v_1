@@ -31,10 +31,6 @@ const productSchema = new mongoose.Schema({
     type: String,
     maxlength: 200,
   },
-  available: {
-    type: Boolean,
-    default: true,
-  },
   priceFixed: {
     type: Boolean,
     default: true,
@@ -62,7 +58,6 @@ const validate = (product) => {
     categoryId: Joi.objectId().required(),
     price: Joi.number().min(0).max(1000).required(),
     unit: Joi.string().min(0).max(1024),
-    available: Joi.boolean().required(),
     priceFixed: Joi.boolean(),
     imageUri: Joi.string().max(1024),
     imagePublicId: Joi.string().max(1024),
@@ -80,7 +75,6 @@ const validateOnUpdate = (product) => {
     categoryId: Joi.objectId(),
     price: Joi.number().min(0).max(1000),
     unit: Joi.string().min(0).max(1024),
-    available: Joi.boolean().required(),
     priceFixed: Joi.boolean(),
     imageUri: Joi.string().max(1024),
     quantity: Joi.number().min(0).max(10000),
