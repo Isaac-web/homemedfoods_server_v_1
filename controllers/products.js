@@ -8,7 +8,6 @@ const createProduct = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  //create product
   let product = new Product({
     name: req.body.name,
     desc: req.body.desc,
@@ -32,15 +31,22 @@ const createProduct = async (req, res) => {
 };
 
 const getProducts = async (req, res) => {
-  const { categoryId } = req.query;
+  const { categoryId, currentPage, pageSize } = req.query;
+  console.log(currentPage, pageSize);
 
   const filter = {}; //query object
   if (categoryId && validateObjectId(categoryId)) filter.category = categoryId;
 
-  const products = await Product.find(filter)
-    .populate("category", "name desc")
-    .populate("discount");
-  res.send(products);
+  const [products, count] = await Promise.all([
+    Product.find(filter)
+      .populate("category", "name desc")
+      .populate("discount")
+      .skip(currentPage * pageSize)
+      .limit(pageSize),
+    Product.find(filter).count(),
+  ]);
+
+  res.send({ count, currentPage, products, pageSize });
 };
 
 const getProduct = async (req, res) => {

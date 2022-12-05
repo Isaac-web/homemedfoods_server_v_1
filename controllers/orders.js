@@ -55,8 +55,7 @@ const getOrders = async (req, res) => {
 
 const getBranchOrders = async (req, res) => {
   const { branch } = req.employee;
-
-  const pageSize = req.query.pageSize || 10;
+  const pageSize = req.query.pageSize;
   const currentPage = req.query.currentPage || 0;
 
   let [orders, ordersCount] = await Promise.all([
