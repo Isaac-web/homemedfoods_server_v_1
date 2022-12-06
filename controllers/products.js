@@ -32,7 +32,6 @@ const createProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
   const { categoryId, currentPage, pageSize } = req.query;
-  console.log(currentPage, pageSize);
 
   const filter = {}; //query object
   if (categoryId && validateObjectId(categoryId)) filter.category = categoryId;
@@ -41,7 +40,7 @@ const getProducts = async (req, res) => {
     Product.find(filter)
       .populate("category", "name desc")
       .populate("discount")
-      .skip(currentPage * pageSize)
+      .skip(currentPage * pageSize || 0)
       .limit(pageSize),
     Product.find(filter).count(),
   ]);
