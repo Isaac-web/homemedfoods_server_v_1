@@ -7,7 +7,8 @@ const createCategory = async (req, res) => {
   const recipeCategory = new RecipeCategory({
     name: req.body.name,
     desc: req.body.desc,
-    imageUri: req.body.imageUri,
+    "image.url": req.body.imageUrl,
+    "image.public_id": req.body.imagePublicId,
   });
 
   await recipeCategory.save();
@@ -16,8 +17,17 @@ const createCategory = async (req, res) => {
 };
 
 const getCategories = async (req, res) => {
-  const categories = await RecipeCategory.find();
-  res.send(categories);
+  const pageSize = req.query.pageSize || null;
+  const currentPage = req.query.currentPage || 0;
+
+  const [categories, count] = await Promise.all([
+    RecipeCategory.find()
+      .skip(currentPage * pageSize)
+      .limit(pageSize),
+    RecipeCategory.find().count(),
+  ]);
+
+  res.send({ count, currentPage, pageSize, categories });
 };
 
 const getCategory = async (req, res) => {

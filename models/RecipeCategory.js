@@ -9,9 +9,9 @@ const RecipeCategory = mongoose.model(
         type: String,
         required: true,
       },
-      imageUri: {
-        type: String,
-        max: 2048,
+      image: {
+        url: String,
+        public_id: String,
       },
       desc: {
         type: String,
@@ -25,7 +25,8 @@ const RecipeCategory = mongoose.model(
 const validate = (recipeCategory) => {
   const schema = Joi.object({
     name: Joi.string().required(),
-    imageUri: Joi.string().min(0).max(2048),
+    imageUrl: Joi.string().min(0).max(2048),
+    imagePublicId: Joi.string().min(0).max(128),
     desc: Joi.string().min(0).max(500),
   });
 
