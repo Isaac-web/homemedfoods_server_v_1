@@ -34,7 +34,7 @@ module.exports = (privilege) => {
       req.employee = user;
       next();
     } catch (err) {
-      return res.status(400).send("Access Denied.");
+      return res.status(400).send("Access Denied. Invalid token.");
     }
   };
 };

@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const { Product, validate, validateOnUpdate } = require("../models/Product");
 const { ProductCategory } = require("../models/ProductCategory");
+const { Recipe } = require("../models/Recipe");
 const uploader = require("../utils/uploader");
 const validateObjectId = require("../utils/validateObjectId");
 
@@ -109,7 +110,9 @@ const deleteProduct = async (req, res) => {
     }
   }
 
-  product.remove();
+  //checkif any recipe is linked to this product
+
+  // product.remove();
 
   res.send(product);
 };

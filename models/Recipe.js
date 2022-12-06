@@ -33,6 +33,15 @@ const recipeSchema = new mongoose.Schema({
       message: "There should be at least one ingredient for the recipe.",
     },
   },
+  yield: {
+    type: Number, 
+    maxlength: 200,
+    required: true
+  },
+  prepTime: {
+    type: Number,
+    min: 0,
+  },
   cookingTime: {
     type: Number,
     min: 0,
@@ -80,16 +89,18 @@ const validate = (recipe) => {
       )
       .min(1)
       .required(),
-    cookingTime: Joi.number().min(0),
+    yield: Joi.string().max(200).required(),
+    prepTime: Joi.number().min(0).required(),
+    cookingTime: Joi.number().min(0).required(),
     cookingMethod: Joi.string().min(0).max(100).required(),
     suitableFor: Joi.string().min(0),
     procedure: Joi.array()
-      .min(1)
       .items(
         Joi.object({
           text: Joi.string(),
         })
-      ),
+      )
+      .min(1),
     videoUrl: Joi.string().max(1024),
     imageUrl: Joi.string().max(1024),
   });

@@ -9,7 +9,7 @@ const createRecipe = async (req, res) => {
   //todo: look up category
   const [recipeCategory, existingRecipe] = await Promise.all([
     RecipeCategory.findById(req.body.categoryId),
-    Recipe.findOne({ name: req.body.name }),
+    Recipe.findOne({ name: new RegExp(req.body.name, "i") }),
   ]);
   if (!recipeCategory)
     return res
@@ -17,13 +17,17 @@ const createRecipe = async (req, res) => {
       .send("Looks like the chosen category cannot be found.");
 
   if (existingRecipe)
-    return res.send(401).send("There is already a recipe with the given name.");
+    return res
+      .status(401)
+      .send("There is already a recipe with the given name.");
 
   const recipe = await new Recipe({
     name: req.body.name,
     category: req.body.categoryId,
     description: req.body.description,
     ingredients: req.body.ingredients,
+    yield: req.body.yield,
+    prepTime: req.body.prepTime,
     cookingTime: req.body.cookingTime,
     cookingMethod: req.body.cookingMethod,
     suitableFor: req.body.suitableFor,
@@ -38,9 +42,18 @@ const createRecipe = async (req, res) => {
 };
 
 const getRecipes = async (req, res) => {
-  const recipes = await Recipe.find();
+  const pageSize = req.query.pageSize;
+  const currentPage = req.query.currentPage || 0;
 
-  res.send(recipes);
+  const [recipes, count] = await romise.all([
+    Recipe.find(),
+    Recipe.find()
+      .count()
+      .skip(currentPage * pageSize)
+      .limit(pageSize),
+  ]);
+
+  res.send({ recipes, count });
 };
 
 const getRecipe = async (req, res) => {
@@ -50,12 +63,45 @@ const getRecipe = async (req, res) => {
 
   const ingredients = recipe.ingredients.map((p) => p.product);
   const ingredientList = await Product.find({ _id: { $in: ingredients } });
-  console.log(ingredientList);
 
   res.send({ recipe, ingredientList });
 };
 
-const updateRecipe = async (req, res) => {};
+const updateRecipe = async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const recipe = await Recipe.findById(req.params.id);
+  if (!recipe) return res.status("Looks like the recipe cannot be found.");
+
+  recipe.name = req.body.name;
+  recipe.category = req.body.categoryId;
+  recipe.description = req.body.description;
+  recipe.ingredients = req.body.ingredients;
+  recipe.cookingTime = req.body.cookingTime;
+  recipe.cookingMethod = req.body.cookingMethod;
+  recipe.suitableFor = req.body.suitableFor;
+  recipe.procedure = req.body.procedure;
+  recipe.videoUrl = req.body.videoUrl;
+  recipe.imgaeUrl = req.body.imageUrl;
+  recipe.ratings = req.body.ratings;
+
+  res.send(recipe);
+
+  //name
+  //category
+  //description
+  //ingredients
+  //description
+  //ingredients
+  //cookingTime
+  //cookingMethod
+  //suitableFor
+  //procedure
+  //videoUrl
+  //imageUrl
+  //ratings
+};
 
 const deleteRecipe = async (req, res) => {
   const recipe = await Recipe.findByIdAndRemove(req.params.id);
@@ -69,4 +115,5 @@ const deleteRecipe = async (req, res) => {
 exports.createRecipe = createRecipe;
 exports.getRecipes = getRecipes;
 exports.getRecipe = getRecipe;
+exports.updateRecipe = updateRecipe;
 exports.deleteRecipe = deleteRecipe;
