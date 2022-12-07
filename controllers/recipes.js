@@ -43,17 +43,19 @@ const createRecipe = async (req, res) => {
 
 const getRecipes = async (req, res) => {
   const pageSize = req.query.pageSize;
-  const currentPage = req.query.currentPage || 0;
+  const currentPage = req.query.currentPage;
 
-  const [recipes, count] = await romise.all([
-    Recipe.find(),
+  const [recipes, count] = await Promise.all([
     Recipe.find()
-      .count()
-      .skip(currentPage * pageSize)
+      .populate("category")
+      .select("-procedure")
+      .skip(currentPage * pageSize || 0)
       .limit(pageSize),
+    ,
+    Recipe.find().count(),
   ]);
 
-  res.send({ recipes, count });
+  res.send({ recipes, count, currentPage, pageSize });
 };
 
 const getRecipe = async (req, res) => {

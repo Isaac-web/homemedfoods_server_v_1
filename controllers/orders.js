@@ -48,9 +48,19 @@ const createOrder = async (req, res) => {
 };
 
 const getOrders = async (req, res) => {
-  let orders = await Order.find().populate("customer").populate("branch");
+  const pageSize = req.query.pageSize;
+  const currentPage = req.query.currentPage || 0;
 
-  res.send(orders);
+  let [orders, ordersCount] = await Promise.all([
+    Order.find()
+      .populate("customer")
+      .populate("branch")
+      .skip(currentPage)
+      .limit(pageSize),
+    Order.find().count(),
+  ]);
+
+  res.send({ pageSize, orders, ordersCount, currentPage });
 };
 
 const getBranchOrders = async (req, res) => {
