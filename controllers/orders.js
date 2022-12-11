@@ -1,6 +1,9 @@
 const { Branch } = require("../models/Branch");
 const { Order, validate, validateOnUpdate } = require("../models/Order");
 const { PaymentMethod } = require("../models/PaymentMethod");
+const { User } = require("../models/User");
+const { CustomerNotification } = require("../models/CustomerNotification");
+const generateOrderId = require("../utils/generateOrderId");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -15,17 +18,22 @@ const createOrder = async (req, res) => {
   if (!paymentMethod) return res.status(404).send("Payment method not found.");
 
   let orderItemsTotal = 0;
-  const orderItems = req.body.order_items.map((item) => ({
-    productId: item.productId,
-    productName: item.productName,
-    optionalPrice: item.optionalPrice,
-    unitPrice: item.unitPrice,
-    imageUri: item.imageUri,
-    quantity: item.quantity,
-    subtotal: (orderItemsTotal += item.optionalPrice
-      ? item.optionalPrice * item.quantity
-      : item.unitPrice * item.quantity),
-  }));
+  const orderItems = req.body.order_items.map((item) => {
+    let subtotal = 0;
+    const orderItem = {
+      productId: item.productId,
+      productName: item.productName,
+      optionalPrice: item.optionalPrice,
+      unitPrice: item.unitPrice,
+      imageUri: item.imageUri,
+      quantity: item.quantity,
+      subtotal: (subtotal += item.optionalPrice
+        ? item.optionalPrice * item.quantity
+        : item.unitPrice * item.quantity),
+    };
+    orderItemsTotal += subtotal;
+    return orderItem;
+  });
 
   const order = new Order({
     customer: req.customer._id,
@@ -38,6 +46,8 @@ const createOrder = async (req, res) => {
     deliveryFee: req.body.deliveryFee,
     total: orderItemsTotal + req.body.deliveryFee,
   });
+
+  order.orderId = generateOrderId(order._id, req.customer._id);
 
   await order.save();
 
@@ -67,14 +77,19 @@ const getBranchOrders = async (req, res) => {
   const { branch } = req.employee;
   const pageSize = req.query.pageSize;
   const currentPage = req.query.currentPage || 0;
+  const { status } = req.query;
+
+  const filter = {};
+  if (branch) filter.branch = branch;
+  if (status) filter["status.value"] = parseInt(status);
 
   let [orders, ordersCount] = await Promise.all([
-    Order.find({ branch })
+    Order.find(filter)
       .populate("customer")
       .populate("branch")
       .skip(currentPage)
       .limit(pageSize),
-    Order.find({ branch }).count(),
+    Order.find(filter).count(),
   ]);
 
   res.send({ pageSize, orders, ordersCount, currentPage });
@@ -83,7 +98,11 @@ const getBranchOrders = async (req, res) => {
 const getBranchPendingOrders = async (req, res) => {
   const { branch } = req.employee;
 
-  let pendingOrders = await Order.find({ branch, "status.value": 0 }).count();
+  const filter = {};
+  if (branch) filter.branch = branch;
+  if (status) filter.status.value = status;
+
+  let pendingOrders = await Order.find(filter).count();
 
   res.send({ pendingOrders: pendingOrders });
 };
@@ -116,6 +135,45 @@ const updateOrderStatus = async (req, res) => {
   });
 
   if (!order) return req.status(404).send("Order not found.");
+
+  res.send(order);
+};
+
+const updateOrderProcess = async (req, res) => {
+  if (!req.body.shopperId)
+    return res.status(400).send("shopperId is required.");
+  if (!req.body.riderId) return res.status(400).send("riderId is required.");
+
+  const shopper = await User.findById(req.body.shopperId);
+  if (!shopper)
+    return res.status(404).send("Looks like the shopper cannot be found.");
+  const rider = await User.findById(req.body.riderId);
+  if (!rider)
+    return res.status(404).send("Looks like the rider cannot be found.");
+
+  const order = await Order.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        "status.value": 1,
+        "status.updated_at": Date.now(),
+        shopper: shopper,
+        rider: rider,
+      },
+    },
+    { new: true }
+  );
+
+  if (!order)
+    return res.status(404).send("Looks like the order cannot be found.");
+
+  const notification = new CustomerNotification({
+    userId: order.customer,
+    title: "Status Update",
+    text: "Your order is being processed. It will get you soon. Thank you for shopping with us.",
+  });
+
+  await notification.save();
 
   res.send(order);
 };
@@ -171,4 +229,5 @@ module.exports = {
   getCustomerOrders,
   updateOnOpen,
   getBranchPendingOrders,
+  updateOrderProcess,
 };

@@ -77,16 +77,35 @@ const createUser = async (req, res) => {
 };
 
 const getUsers = async (req, res) => {
-  const { userType, branchId } = req.query;
+  const { userType, branchId, pageSize, q, designationId } = req.query;
+  const currentPage = req.query.currentPage || 0;
+
   const filter = {};
   if (userType) filter.userType = userType;
   if (userType === "employee" && branchId) filter.branchId = branchId;
+  if (userType === "employee" && designationId)
+    filter.designation = designationId;
 
-  const users = await User.find(filter)
-    .populate("branch")
-    .populate("designation")
-    .select("-password");
-  res.send(users);
+  if (q) {
+    let searchString = new RegExp(q, "i");
+    filter.$or = [
+      { firstname: searchString },
+      { lastname: searchString },
+      { email: searchString },
+    ];
+  }
+
+  const [users, count] = await Promise.all([
+    User.find(filter)
+      .populate("branch")
+      .populate("designation")
+      .select("-password")
+      .skip(currentPage * pageSize || 0)
+      .limit(pageSize),
+    User.find().count(),
+  ]);
+
+  res.send({ users, count, currentPage, pageSize });
 };
 
 const getUser = async (req, res) => {

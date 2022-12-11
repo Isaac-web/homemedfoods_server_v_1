@@ -15,6 +15,11 @@ const deliveryAddressSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
   {
+    orderId: {
+      type: String,
+      createIndex: true,
+      required: true,
+    },
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
@@ -53,6 +58,10 @@ const orderSchema = new mongoose.Schema(
     confirmed_at: {
       type: Date,
       defalut: null,
+    },
+    shopper: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
     },
     rider: {
       type: mongoose.Schema.Types.ObjectId,

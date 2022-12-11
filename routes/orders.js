@@ -28,10 +28,11 @@ router.get(
 );
 
 router.patch(
-  "/:id/status",
-  [validateId],
-  errorHandler(controller.updateOrderStatus)
+  "/:id/shopper",
+  [validateId, auth("mananger")],
+  errorHandler(controller.updateOrderProcess)
 );
+
 router.get("/:id", [validateId], errorHandler(controller.getOrder)); //todo: add valiation
 router.patch("/:id/dispatch", [validateId], errorHandler(controller.dispatchOrder));
 router.patch("/:id/opened", [validateId], errorHandler(controller.updateOnOpen));

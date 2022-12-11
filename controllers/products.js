@@ -115,7 +115,7 @@ const deleteProduct = async (req, res) => {
 
   //checkif any recipe is linked to this product
 
-  // product.remove();
+  product.remove();
 
   res.send(product);
 };
