@@ -1,6 +1,7 @@
 const { Recipe, validate } = require("../models/Recipe");
 const { RecipeCategory } = require("../models/RecipeCategory");
 const { Product } = require("../models/Product");
+const uploader = require("../utils/uploader");
 
 const createRecipe = async (req, res) => {
   const { error } = validate(req.body);
@@ -32,8 +33,10 @@ const createRecipe = async (req, res) => {
     cookingMethod: req.body.cookingMethod,
     suitableFor: req.body.suitableFor,
     procedure: req.body.procedure,
-    videoUrl: req.body.videoUrl,
-    imageUrl: req.body.imageUrl,
+    "video.url": req.body.videoUrl,
+    "video.public_id": req.body.videoPublicId,
+    "image.url": req.body.imageUrl,
+    "image.public_id": req.body.imagePublicId,
   });
 
   await recipe.save();
@@ -89,24 +92,21 @@ const updateRecipe = async (req, res) => {
   recipe.ratings = req.body.ratings;
 
   res.send(recipe);
-
-  //name
-  //category
-  //description
-  //ingredients
-  //description
-  //ingredients
-  //cookingTime
-  //cookingMethod
-  //suitableFor
-  //procedure
-  //videoUrl
-  //imageUrl
-  //ratings
 };
 
 const deleteRecipe = async (req, res) => {
-  const recipe = await Recipe.findByIdAndRemove(req.params.id);
+  const recipe = await Recipe.findById(req.params.id);
+
+  if (recipe.image.public_id) {
+    try {
+      await uploader.deleteFile(recipe.image.public_id)
+    }
+    catch(err){
+      return res.status(500).send("Something went wrong while deleting the recipe.")
+    }
+  }
+
+  recipe.remove();
 
   if (!recipe)
     return res.status(404).send("Lookes like the id recipe cannot be found.");

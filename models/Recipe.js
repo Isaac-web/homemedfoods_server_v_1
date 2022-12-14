@@ -33,10 +33,15 @@ const recipeSchema = new mongoose.Schema({
       message: "There should be at least one ingredient for the recipe.",
     },
   },
+  difficulty: {
+    type: String,
+    enum: ["easy", "medium", "hard"],
+    default: "easy",
+  },
   yield: {
-    type: Number, 
+    type: Number,
     maxlength: 200,
-    required: true
+    required: true,
   },
   prepTime: {
     type: Number,
@@ -58,13 +63,13 @@ const recipeSchema = new mongoose.Schema({
   procedure: {
     type: [{ text: { type: String } }],
   },
-  videoUrl: {
-    type: String,
-    max: 1024,
+  video: {
+    url: String,
+    public_id: String,
   },
-  imageUrl: {
-    type: String,
-    max: 1024,
+  image: {
+    url: String,
+    public_id: String,
   },
   ratings: [
     {
@@ -102,7 +107,9 @@ const validate = (recipe) => {
       )
       .min(1),
     videoUrl: Joi.string().max(1024),
+    videoPublicId: Joi.string().max(1024),
     imageUrl: Joi.string().max(1024),
+    imagePublicId: Joi.string().max(1024),
   });
 
   return schema.validate(recipe);

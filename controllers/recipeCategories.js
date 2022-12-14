@@ -1,4 +1,5 @@
 const { RecipeCategory, validate } = require("../models/RecipeCategory");
+const { Recipe } = require("../models/Recipe");
 
 const createCategory = async (req, res) => {
   const { error } = validate(req.body);
@@ -63,6 +64,12 @@ const updateCategory = async (req, res) => {
 };
 
 const deleteCategory = async (req, res) => {
+  const recipe = await Recipe.findOne({ category: req.params.id });
+  if (recipe)
+    return res
+      .status(401)
+      .send("Could not delete. This category is linked to some recipes.");
+
   const category = await RecipeCategory.findByIdAndRemove(req.params.id);
   if (!category)
     return res
