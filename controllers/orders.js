@@ -51,9 +51,6 @@ const createOrder = async (req, res) => {
 
   await order.save();
 
-  const io = req.app.get("io");
-  io.emit("newOrder", JSON.stringify(order));
-
   res.send(order);
 };
 
@@ -119,7 +116,7 @@ const getOrder = async (req, res) => {
 };
 
 const getCustomerOrders = async (req, res) => {
-  const orders = await Order.find({ userId: req.customer._id });
+  const orders = await Order.find({ customer: req.customer._id });
 
   res.send(orders);
 };
