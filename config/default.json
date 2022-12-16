@@ -11,9 +11,9 @@
     }
   },
   "cloudinary": {
-    "api_key": "",
-    "api_secret": "",
-    "cloud_name": ""
+    "api_key": "622534129641649",
+    "api_secret": "a-dkeyhieUIr1ZLqDSPHJUe-1x8",
+    "cloud_name": "don6m08ed"
   },
   "Invitation": {
     "expirationDurationMs": 86400

@@ -77,12 +77,16 @@ const updateProduct = async (req, res) => {
   if (!product) return res.status(404).send("Product not found.");
 
   if (product?.image?.url && req.body.imageUri) {
-    if (product.image.url != req.body.imageUri)
+    if (product.image.url != req.body.imageUri) {
+      const rawPublicId = product.image.url.split("/").slice(-2).join("/");
+      const _publicId = rawPublicId.split(".")[0];
+
       try {
-        await uploader.deleteFile(product.image.public_id);
+        await uploader.deleteFile(product.image?.public_id || _publicId);
       } catch (err) {
         return res.status(400).send("Oops... could not update product.");
       }
+    }
   }
 
   product.name = req.body.name;
@@ -91,11 +95,13 @@ const updateProduct = async (req, res) => {
   product.price = req.body.price;
   product.unit = req.body.unit;
   product.priceFixed = req.body.priceFixed;
-  product.image.public_id = req.body?.imagePublicId;
   product.status = req.body.status;
   product.discount = req.body?.discountId;
 
-  if (req.body.imageUri) product.image.url = req.body.imageUri;
+  if (req.body.imageUri) {
+    product.image.url = req.body.imageUri;
+    product.image.public_id = req.body?.imagePublicId;
+  }
 
   await product.save();
   return res.send(product);
@@ -105,11 +111,13 @@ const deleteProduct = async (req, res) => {
   let product = await Product.findById(req.params.id);
   if (!product) return res.status(404).send("Product not found.");
 
-  if (product?.image?.public_id) {
+  if (product?.image?.url) {
+    const rawPublicId = product.image.url.split("/").slice(-2).join("/");
+    const _publicId = rawPublicId.split(".")[0];
     try {
-      await uploader.deleteFile(product?.image?.public_id);
-    } catch (error) {
-      return res.status(500).send("Oops... Could not delete product.");
+      await uploader.deleteFile(product.image?.public_id || _publicId);
+    } catch (err) {
+      return res.status(400).send("Oops... could not update product.");
     }
   }
 
