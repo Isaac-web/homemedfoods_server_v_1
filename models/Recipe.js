@@ -111,7 +111,7 @@ const validate = (recipe) => {
       )
       .min(1)
       .required(),
-    yieldValue: Joi.string().min(0).required(),
+    yieldValue: Joi.number().min(0).required(),
     yieldLabel: Joi.string().max(100).required(),
     prepTime: Joi.number().min(0).required(),
     cookingTime: Joi.number().min(0).required(),
@@ -124,7 +124,7 @@ const validate = (recipe) => {
         })
       )
       .min(1),
-    videoUrl: Joi.string().max(1024),
+    videoUrl: Joi.string().min(0).max(1024),
     videoPublicId: Joi.string().max(1024),
     imageUrl: Joi.string().max(1024),
     imagePublicId: Joi.string().max(1024),

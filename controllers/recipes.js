@@ -10,7 +10,7 @@ const createRecipe = async (req, res) => {
   //todo: look up category
   const [recipeCategory, existingRecipe] = await Promise.all([
     RecipeCategory.findById(req.body.categoryId),
-    Recipe.findOne({ name: new RegExp(req.body.name, "i") }),
+    Recipe.findOne({ name: req.body.name }),
   ]);
   if (!recipeCategory)
     return res
