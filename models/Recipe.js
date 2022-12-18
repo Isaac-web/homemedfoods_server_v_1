@@ -24,6 +24,15 @@ const recipeSchema = new mongoose.Schema({
           ref: "Product",
           required: true,
         },
+        measure: {
+          type: String, 
+        },
+        quantity: {
+          type: Number, 
+          min: 0, 
+          default: 1
+        }
+        
       },
     ],
     validate: {
@@ -39,9 +48,17 @@ const recipeSchema = new mongoose.Schema({
     default: "easy",
   },
   yield: {
-    type: Number,
-    maxlength: 200,
-    required: true,
+    value: {
+      type: Number,
+      min: 0,
+      required: true,
+    }, 
+    label: {
+      type: String, 
+      maxlength: 100,
+      required: true
+    }
+    
   },
   prepTime: {
     type: Number,
@@ -94,7 +111,8 @@ const validate = (recipe) => {
       )
       .min(1)
       .required(),
-    yield: Joi.string().max(200).required(),
+    yieldValue: Joi.string().min(0).required(),
+    yieldLabel: Joi.string().max(100).required(),
     prepTime: Joi.number().min(0).required(),
     cookingTime: Joi.number().min(0).required(),
     cookingMethod: Joi.string().min(0).max(100).required(),

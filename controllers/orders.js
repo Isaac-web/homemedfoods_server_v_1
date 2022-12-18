@@ -93,13 +93,16 @@ const getBranchOrders = async (req, res) => {
 };
 
 const getBranchPendingOrders = async (req, res) => {
-  const { branch } = req.employee;
+  const { branch } = req.employee || {};
+  const status = req.query.status;
 
   const filter = {};
   if (branch) filter.branch = branch;
-  if (status) filter.status.value = status;
+  if (status) filter["status.value"] = status;
 
-  let pendingOrders = await Order.find(filter).count();
+  let pendingOrders = await Promise.all([
+    Order.find(filter).count(), 
+  ]);
 
   res.send({ pendingOrders: pendingOrders });
 };
@@ -167,7 +170,7 @@ const updateOrderProcess = async (req, res) => {
   const notification = new CustomerNotification({
     userId: order.customer,
     title: "Status Update",
-    text: "Your order is being processed. It will get you soon. Thank you for shopping with us.",
+    text: "Your order is being processed. It will get to you soon. Thank you for shopping with us.",
   });
 
   await notification.save();

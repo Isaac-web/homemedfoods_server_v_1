@@ -5,3 +5,10 @@ module.exports = (customerId, orderId) => {
 
   return `${customerIdInt}${orderIdInt}`;
 };
+
+
+
+const test = () => {
+  "day-hour-minute-sec-user_id";
+  "00-00-00-00";
+};
