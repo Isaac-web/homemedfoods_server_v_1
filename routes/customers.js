@@ -13,5 +13,6 @@ router.get("/", auth("manager"), errorHandler(controller.getCustomers));
 router.get("/me", customerAuth, errorHandler(controller.getCustomer));
 router.get("/:id", auth("manager"), errorHandler(controller.getCustomer));
 router.put("/me", customerAuth, errorHandler(controller.updateCustomer));
+router.delete("/me", customerAuth, errorHandler(controller.deleteCustomer));
 
 module.exports = router;

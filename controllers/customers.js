@@ -7,6 +7,8 @@ const {
   validateOnUpdate,
 } = require("../models/Customer");
 const { ShoppingCart } = require("../models/ShoppingCart");
+const { CustomerNotification } = require("../models/CustomerNotification");
+const { Order } = require("../models/Order");
 
 const register = async (req, res) => {
   //For now, email customer will be logged in automatically
@@ -95,10 +97,23 @@ const updateCustomer = async (req, res) => {
   res.send(customer);
 };
 
+const deleteCustomer = async (req, res) => {
+  const [customer] = await Promise.all([
+    Customer.findByIdAndRemove(req.customer._id),
+    CustomerNotification.deleteMany({ userId: req.customer._id }),
+    Order.deleteMany({ customer: req.customer._id }),
+  ]);
+
+  
+
+  res.send(customer);
+};
+
 module.exports = {
   getCustomers,
   getCustomer,
   updateCustomer,
+  deleteCustomer,
   register,
   login,
 };
