@@ -121,7 +121,7 @@ const Order = mongoose.model("Order", orderSchema);
 const validate = (order) => {
   const schema = Joi.object({
     customer: Joi.objectId(),
-    comment: Joi.string().max(500),
+    comment: Joi.string().min(0).max(500),
     order_items: Joi.array()
       .items(
         Joi.object({

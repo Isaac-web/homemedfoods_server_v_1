@@ -104,8 +104,6 @@ const deleteCustomer = async (req, res) => {
     Order.deleteMany({ customer: req.customer._id }),
   ]);
 
-  
-
   res.send(customer);
 };
 
