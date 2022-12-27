@@ -106,7 +106,9 @@ const validate = (recipe) => {
     ingredients: Joi.array()
       .items(
         Joi.object({
+          _id: Joi.objectId().optional(),
           product: Joi.objectId().required(),
+          quantity: Joi.number().min(0).optional(),
         })
       )
       .min(1)
@@ -120,6 +122,7 @@ const validate = (recipe) => {
     procedure: Joi.array()
       .items(
         Joi.object({
+          _id: Joi.objectId().optional(),
           text: Joi.string(),
         })
       )
