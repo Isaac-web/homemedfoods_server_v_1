@@ -68,7 +68,18 @@ const getRecipe = async (req, res) => {
   if (!recipe) return res.status(404).send("Recipe not found.");
 
   const ingredients = recipe.ingredients.map((p) => p.product);
-  const ingredientList = await Product.find({ _id: { $in: ingredients } });
+  let ingredientList = await Product.find({ _id: { $in: ingredients } });
+
+  ingredientList = ingredientList.map((item) => {
+    const result = recipe.ingredients.filter(
+      (ri) => ri.product.toHexString() == item._id.toHexString()
+    );
+
+    if (result.length)
+      item = Object.assign({}, item._doc, { quantity: result[0].quantity });
+
+    return item;
+  });
 
   res.send({ recipe, ingredientList });
 };
@@ -92,8 +103,7 @@ const updateRecipe = async (req, res) => {
   recipe.ratings = req.body.ratings;
   if (req.body.imageUrl) recipe.imgaeUrl = req.body.imageUrl;
 
-
-  await recipe.save()
+  await recipe.save();
 
   res.send(recipe);
 };
