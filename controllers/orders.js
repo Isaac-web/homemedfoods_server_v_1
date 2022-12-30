@@ -68,6 +68,11 @@ const createOrder = async (req, res) => {
       //return 400 if coupon has already been used.
       return res.status(400).send("Coupon has already been used.");
 
+    if (coupon.usedBy.length >= coupon.limit)
+      return res
+        .status(400)
+        .send("Looks like the coupon has exceeded its maximum usage limit.");
+
     order.total = Math.max.apply(null, [0, order.total - coupon.amount]);
     coupon.usedBy = [...coupon.usedBy, req.customer._id];
 

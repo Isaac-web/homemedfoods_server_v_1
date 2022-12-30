@@ -35,6 +35,20 @@ const getCoupons = async (req, res) => {
   res.send({ coupons });
 };
 
+const getCustomerCuopon = async (req, res) => {
+  const { couponCode } = req.query;
+  if (!couponCode) return res.status(404).send("Coupon not found.");
+
+  const filter = {};
+  if (couponCode) filter.code = couponCode;
+
+  const coupon = await Coupon.findOne(filter);
+
+  if (!coupon)
+    return res.status(404).send("Looks like the coupon cannot be found.");
+
+  res.send(coupon);
+};
 const getCoupon = async (req, res) => {
   const coupon = await Coupon.findById(req.params.id);
   if (!coupon)
@@ -77,5 +91,6 @@ const deleteCoupon = async (req, res) => {
 exports.createCoupon = createCoupon;
 exports.getCoupons = getCoupons;
 exports.getCoupon = getCoupon;
+exports.getCustomerCuopon = getCustomerCuopon;
 exports.deleteCoupon = deleteCoupon;
 exports.updateCoupon = updateCoupon;
