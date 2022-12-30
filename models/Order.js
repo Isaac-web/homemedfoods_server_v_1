@@ -101,6 +101,10 @@ const orderSchema = new mongoose.Schema(
       min: 0,
       required: true,
     },
+    couponId: {
+      type: mongoose.Types.ObjectId,
+      required: false,
+    },
     total: {
       type: Number,
       min: 0,
@@ -145,6 +149,7 @@ const validate = (order) => {
     deliveryFee: Joi.number().min(0).required(),
     branch: Joi.objectId().required(),
     payment_method_id: Joi.objectId().required(),
+    couponCode: Joi.string().optional().min(0).max(20),
     total: Joi.number().min(0).greater(0),
   });
 

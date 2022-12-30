@@ -17,5 +17,8 @@
   },
   "Invitation": {
     "expirationDurationMs": 86400
+  },
+  "arkesel": {
+    "apiKey": "OjZaajgzRTVjbVdwU0xISko="
   }
 }

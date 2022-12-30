@@ -4,14 +4,16 @@ const { PaymentMethod } = require("../models/PaymentMethod");
 const { User } = require("../models/User");
 const { CustomerNotification } = require("../models/CustomerNotification");
 const generateOrderId = require("../utils/generateOrderId");
+const { Coupon } = require("../models/Coupon");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const [branch, paymentMethod] = await Promise.all([
+  const [branch, paymentMethod, coupon] = await Promise.all([
     Branch.findById(req.body.branch),
     PaymentMethod.findById(req.body.payment_method_id),
+    Coupon.findOne({ code: req.body.couponCode }),
   ]);
 
   if (!branch) return res.status(404).send("Branch not found.");
@@ -46,6 +48,31 @@ const createOrder = async (req, res) => {
     deliveryFee: req.body.deliveryFee,
     total: orderItemsTotal + req.body.deliveryFee,
   });
+
+  if (req.body.couponCode && !coupon)
+    return res.status(404).send("Looks like the coupon used cannot be found.");
+
+  if (coupon) {
+    if (!coupon.active)
+      return res
+        .status(400)
+        .send(
+          "The coupon provided is currently deactivated and cannot be used."
+        );
+
+    if (new Date(coupon.expiresAt).getTime() < Date.now())
+      // return 400 if coupon is expired.
+      return res.status(400).send("The coupon provided is expired.");
+
+    if (coupon.usedBy.indexOf(req.customer._id) > -1)
+      //return 400 if coupon has already been used.
+      return res.status(400).send("Coupon has already been used.");
+
+    order.total = Math.max.apply(null, [0, order.total - coupon.amount]);
+    coupon.usedBy = [...coupon.usedBy, req.customer._id];
+
+    await coupon.save();
+  }
 
   order.orderId = generateOrderId(order._id, req.customer._id);
 
