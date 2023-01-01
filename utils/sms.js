@@ -7,12 +7,10 @@ const api = axios.create({
 });
 
 const sendSms = async (number, message) => {
-  
   let recipients;
-  if(typeof number === "string") recipients = [number]
+  if (typeof number === "string") recipients = [number];
   else if (number instanceof Array) recipients = number;
-  
-  console.log(recipients);
+
   const url = `/v2/sms/send`;
   const data = {
     sender: "Digimart",
@@ -53,7 +51,6 @@ const generateOTP = async (number) => {
   }
 };
 
-
 const verifyOTP = async (number, code) => {
   const data = {
     api_key: apiKey,
@@ -67,13 +64,10 @@ const verifyOTP = async (number, code) => {
     url: "/otp/verify",
   });
 
-  console.log(res.status);
   return res.status;
 };
 
-console.log(sendSms(["233553039567", "233244103657", "233246901226"], "Make you no stress. We dey for you"));
-// generateOTP("233553039567");
-// verifyOTP("233553039567", 324702);
-
+exports.sendSms = sendSms;
+exports.verifyOTP = verifyOTP;
 
 

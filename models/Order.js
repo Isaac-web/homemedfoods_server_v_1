@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
+const generateUniqueId = require("generate-unique-id");
 
 const { orderItemSchema } = require("../models/OrderItem");
 
@@ -119,6 +120,22 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+orderSchema.methods.generateOrderId = async function (
+  prefix,
+  length = 11,
+  useLetters = false
+) {
+  const id = generateUniqueId({
+    length,
+    useLetters,
+  });
+
+  const order = await Order.findOne({ orderId: id });
+  if (!order) return (prefix || "") + id;
+
+  this.generateOrderId();
+};
 
 const Order = mongoose.model("Order", orderSchema);
 

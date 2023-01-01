@@ -24,7 +24,7 @@ module.exports = (privilege) => {
       if (user.userType == "system") return next();
 
       if (privilege === "system" && user.userType !== "system")
-        return res.status(403).send("Access denied.");
+        return res.status(403).send("Access denied..");
 
       const designation = Designation.findById(user.designation);
       const designationValue = privileges[designation.value];
@@ -34,7 +34,7 @@ module.exports = (privilege) => {
       req.employee = user;
       next();
     } catch (err) {
-      return res.status(400).send("Access Denied. Invalid token.");
+      return res.status(400).send("Invalid token. Please login.");
     }
   };
 };

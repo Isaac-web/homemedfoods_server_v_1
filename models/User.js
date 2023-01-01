@@ -121,7 +121,7 @@ userSchema.methods.verifyRequiredData = async function () {
   }
 };
 
-userSchema.methods.genAuthToken = function () {
+userSchema.methods.generateAuthToken = function () {
   const payload = {
     _id: this._id,
     name: `${this.firstname} ${this.lastname || ""}`,
@@ -153,8 +153,8 @@ const validate = (employee) => {
     imageUri: Joi.string().min(0),
     branchId: Joi.string().required(),
     digitalAddress: Joi.string().min(0).max(100).required(),
-    password: Joi.string().min(10).max(128).required(),
-    confirmPassword: Joi.string().min(10).max(128).required(),
+    password: Joi.string().min(7).max(128).required(),
+    confirmPassword: Joi.string().min(7).max(128).required(),
   });
 
   return schema.validate(employee);
@@ -174,8 +174,8 @@ const validateOnUpdate = (employee) => {
     imageUri: Joi.string().min(0),
     branchId: Joi.string().required(),
     digitalAddress: Joi.string().min(0).max(100).required(),
-    password: Joi.string().min(10).max(128).required(),
-    confirmPassword: Joi.string().min(10).max(128).required(),
+    password: Joi.string().min(7).max(128).required(),
+    confirmPassword: Joi.string().min(7).max(128).required(),
   });
 
   return schema.validate(employee);

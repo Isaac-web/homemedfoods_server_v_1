@@ -3,7 +3,6 @@ const { Order, validate, validateOnUpdate } = require("../models/Order");
 const { PaymentMethod } = require("../models/PaymentMethod");
 const { User } = require("../models/User");
 const { CustomerNotification } = require("../models/CustomerNotification");
-const generateOrderId = require("../utils/generateOrderId");
 const { Coupon } = require("../models/Coupon");
 
 const createOrder = async (req, res) => {
@@ -62,11 +61,13 @@ const createOrder = async (req, res) => {
 
     if (new Date(coupon.expiresAt).getTime() < Date.now())
       // return 400 if coupon is expired.
-      return res.status(400).send("The coupon provided is expired.");
+      return res.status(400).send("The coupon used is expired.");
 
     if (coupon.usedBy.indexOf(req.customer._id) > -1)
       //return 400 if coupon has already been used.
-      return res.status(400).send("Coupon has already been used.");
+      return res
+        .status(400)
+        .send("Looks like the coupon has already been used.");
 
     if (coupon.usedBy.length >= coupon.limit)
       return res
@@ -79,7 +80,7 @@ const createOrder = async (req, res) => {
     await coupon.save();
   }
 
-  order.orderId = generateOrderId(order._id, req.customer._id);
+  order.orderId = await order.generateOrderId();
 
   await order.save();
 
@@ -89,9 +90,13 @@ const createOrder = async (req, res) => {
 const getOrders = async (req, res) => {
   const pageSize = req.query.pageSize;
   const currentPage = req.query.currentPage || 0;
+  const orderId = req.query.orderId;
+
+  const filter = {};
+  if (orderId) filter.orderId = new RegExp(orderId, "i");
 
   let [orders, ordersCount] = await Promise.all([
-    Order.find()
+    Order.find(filter)
       .populate("customer")
       .populate("branch")
       .skip(currentPage)
@@ -132,9 +137,7 @@ const getBranchPendingOrders = async (req, res) => {
   if (branch) filter.branch = branch;
   if (status) filter["status.value"] = status;
 
-  let pendingOrders = await Promise.all([
-    Order.find(filter).count(), 
-  ]);
+  let pendingOrders = await Promise.all([Order.find(filter).count()]);
 
   res.send({ pendingOrders: pendingOrders });
 };
@@ -249,6 +252,7 @@ const dispatchOrder = async (req, res) => {
 
   res.send(order);
 };
+
 
 module.exports = {
   createOrder,
