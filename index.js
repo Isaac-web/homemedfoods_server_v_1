@@ -1,6 +1,7 @@
 const express = require("express");
 const { createServer } = require("http");
 const config = require("config");
+const { Customer } = require("./models/Customer");
 require("dotenv").config();
 
 const app = express();
@@ -25,32 +26,20 @@ require("./startup/routes")(app);
 require("./startup/connections")(httpServer);
 require("./startup/error")(app);
 
-const io = require("socket.io")(httpServer, {
-  cors: {
-    origin: "*",
-  },
-});
+const modifyCustomerContact = async () => {
+  const customers = await Customer.find();
 
-let usersOnline = [];
-const addUserOnline = (userId, socketId) => {
-  const index = usersOnline.findIndex((user) => user.userId === userId);
-  if (index == -1) {
-    usersOnline.push({ userId, socketId });
+  for (let i = 0; i < customers.length; i++) {
+    const customer = customers[i];
+
+    if (customer.phone.charAt(0) === "0") {
+      customer.phone = "+233" + customer.phone.slice(1);
+      await customer.save();
+    }
   }
 };
 
-const removeUserOnline = (socketId) => {
-  usersOnline = usersOnline.filter((user) => user.socketId !== socketId);
-};
-
-io.on("connection", (socket) => {
-  socket.on("userOnline", ({ userId }) => {
-    addUserOnline(userId, socket.id);
-  });
-  socket.on("disconnect", () => removeUserOnline(socket.id));
-});
-
-app.set("io", io);
+modifyCustomerContact();
 
 module.exports = app;
 
