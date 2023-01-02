@@ -6,9 +6,10 @@ const {
   validateAuth,
   validateOnUpdate,
 } = require("../models/Customer");
-const { ShoppingCart } = require("../models/ShoppingCart");
 const { CustomerNotification } = require("../models/CustomerNotification");
 const { Order } = require("../models/Order");
+const { OTP } = require("../models/OTP");
+const { sendSms } = require("../utils/sms");
 
 const register = async (req, res) => {
   //For now, email customer will be logged in automatically
@@ -33,13 +34,14 @@ const register = async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
   customer.password = hashedPassword;
 
-  //create a shopping cart for the customer
-  const shoppingCart = new ShoppingCart({
-    _id: customer._id,
-    userId: customer._id,
-  });
+  //generate and send otp to user
+  const otp = OTP({ phone: customer.phone });
 
-  await Promise.all([customer.save(), shoppingCart.save()]);
+  await Promise.all([
+    customer.save(),
+    sendSms(otp.phone, `${otp.pin} is your Digimart verification code.`),
+    otp.save(),
+  ]);
 
   customer.password = undefined;
   const token = customer.generateAuthToken();
