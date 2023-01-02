@@ -13,6 +13,7 @@ const recipes = require("../routes/recipes");
 const customerNotifications = require("../routes/customerNotifications");
 const coupons = require("../routes/coupons");
 const otp = require("../routes/otp");
+const reports = require("../routes/reports");
 
 module.exports = (app) => {
   app.get("/ping", (req, res) => {
@@ -34,4 +35,5 @@ module.exports = (app) => {
   app.use("/api/notifications", customerNotifications);
   app.use("/api/coupons", coupons);
   app.use("/api/otp", otp);
+  app.use("/api/reports", reports);
 };

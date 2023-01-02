@@ -13,7 +13,7 @@ const generateOTP = async (req, res) => {
   });
 
   const status = await sendSms(
-    "233553039567",
+    "+233553039567",
     `${otpString} 
     is your Digimart verification code. It is active for 7 minutes and can be used only once.`
   );
