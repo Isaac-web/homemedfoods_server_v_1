@@ -89,7 +89,18 @@ const validateAuth = (user) => {
   return schema.validate(user);
 };
 
+
+const validateOnResetPassword = (request) => {
+  const schema = Joi.object({
+    password: Joi.string().min(7).required(),
+    confirmPassword: Joi.string().min(7).required(),
+  });
+
+  return schema.validate(request);
+};
+
 module.exports.validate = validate;
 module.exports.validateOnUpdate = validateOnUpdate;
-module.exports.validateAuth = validateAuth
+module.exports.validateAuth = validateAuth;
+module.exports.validateOnResetPassword = validateOnResetPassword;
 module.exports.Customer = Customer;

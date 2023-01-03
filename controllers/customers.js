@@ -5,6 +5,7 @@ const {
   validate,
   validateAuth,
   validateOnUpdate,
+  validateOnResetPassword,
 } = require("../models/Customer");
 const { CustomerNotification } = require("../models/CustomerNotification");
 const { Order } = require("../models/Order");
@@ -99,6 +100,25 @@ const updateCustomer = async (req, res) => {
   res.send(customer);
 };
 
+const resetPassword = async (req, res) => {
+  const { error } = validateOnResetPassword(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  if (req.body.password !== req.body.confirmPassword)
+    return res.status(400).send("Passwords donnot match.");
+
+  const salt = await bcrypt.genSalt(12);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+  await Customer.findByIdAndUpdate(req.customer._id, {
+    $set: {
+      password: hashedPassword,
+    },
+  });
+
+  res.send({ message: "Password has been updated." });
+};
+
 const deleteCustomer = async (req, res) => {
   const [customer] = await Promise.all([
     Customer.findByIdAndRemove(req.customer._id),
@@ -114,6 +134,7 @@ module.exports = {
   getCustomer,
   updateCustomer,
   deleteCustomer,
+  resetPassword,
   register,
   login,
 };
