@@ -37,6 +37,10 @@ const customerSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  active: {
+    type: Boolean,
+    default: false,
+  },
   password: {
     type: String,
     minlength: 7,
@@ -51,7 +55,10 @@ const customerSchema = new mongoose.Schema({
 });
 
 customerSchema.methods.generateAuthToken = function () {
-  return jwt.sign({ _id: this._id }, config.get("auth.privateKey"));
+  return jwt.sign(
+    { _id: this._id, active: this.active },
+    config.get("auth.privateKey")
+  );
 };
 
 const Customer = mongoose.model("Customer", customerSchema);

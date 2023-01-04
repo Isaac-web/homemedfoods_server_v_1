@@ -34,6 +34,9 @@ const verifyOTP = async (req, res) => {
   const user = await Customer.findOne({ phone: req.body.phone });
   if (!user) return res.status(404).send("User cannot found.");
 
+  user.active = true;
+  await user.save();
+
   const token = user.generateAuthToken();
 
   await OTP.deleteMany({ phone });
