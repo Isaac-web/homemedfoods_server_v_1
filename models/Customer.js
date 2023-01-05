@@ -26,6 +26,12 @@ const customerSchema = new mongoose.Schema({
     trim: true,
     required: true,
   },
+  name: {
+    type: String,
+    default: function () {
+      return `${this.firstname} ${this.lastname}`;
+    },
+  },
   phone: {
     type: String,
     minlength: 3,

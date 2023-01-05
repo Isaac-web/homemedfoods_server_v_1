@@ -67,9 +67,22 @@ const login = async (req, res) => {
 };
 
 const getCustomers = async (req, res) => {
-  const customers = await Customer.find();
+  const { name } = req.query;
 
-  res.send(customers);
+  let filter = {};
+  if (name) {
+    filter = {
+      ...filter,
+      $or: [{ firstname: RegExp(name, "i") }, { lastname: RegExp(name, "i") }],
+    };
+  }
+
+  const [customers, count] = await Promise.all([
+    Customer.find(filter),
+    Customer.find(filter).count(),
+  ]);
+
+  res.send({ customers, count });
 };
 
 const getCustomer = async (req, res) => {
