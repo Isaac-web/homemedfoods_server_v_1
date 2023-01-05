@@ -34,9 +34,9 @@ router.patch(
 );
 
 router.get("/:id", [validateId], errorHandler(controller.getOrder)); //todo: add valiation
-router.patch("/:id/dispatch", [validateId], errorHandler(controller.dispatchOrder));
-router.patch("/:id/opened", [validateId], errorHandler(controller.updateOnOpen));
-router.patch("/:id", [validateId], errorHandler(controller.updateOrder));
-router.delete("/", errorHandler(orders)); //Todo: Only an admin should be able to delete the order
+router.patch("/:id/dispatch", [validateId, auth("mananger"),], errorHandler(controller.dispatchOrder));
+router.patch("/:id/opened", [validateId, auth("mananger"),], errorHandler(controller.updateOnOpen));
+router.patch("/:id", [validateId, auth("mananger"),], errorHandler(controller.updateOrder));
+router.delete("/:id", auth("mananger"), errorHandler(controller.deleteOrder)); //Todo: Only an admin should be able to delete the order
 
 module.exports = router;

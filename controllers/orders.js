@@ -254,6 +254,14 @@ const dispatchOrder = async (req, res) => {
 };
 
 
+const deleteOrder = async (req, res) => {
+  const order = await Order.findByIdAndRemove(req.params.id);
+
+  if (!order) return res.status(404).send("Looks like order cannot be found.");
+
+  res.send(order);
+};
+
 module.exports = {
   createOrder,
   dispatchOrder,
@@ -266,4 +274,5 @@ module.exports = {
   updateOnOpen,
   getBranchPendingOrders,
   updateOrderProcess,
+  deleteOrder,
 };
