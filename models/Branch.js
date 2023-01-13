@@ -16,6 +16,10 @@ const Branch = mongoose.model(
       maxlength: 500,
       trim: true,
     },
+    isOpen: {
+      type: Boolean,
+      default: false,
+    },
     address: {
       city: {
         type: String,

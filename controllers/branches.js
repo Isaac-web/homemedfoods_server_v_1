@@ -1,3 +1,4 @@
+const { response } = require("express");
 const { Branch, validate, validateOnUpdate } = require("../models/Branch");
 
 const createBranch = async (req, res) => {
@@ -63,10 +64,62 @@ const deleteBranch = async (req, res) => {
   res.send(branch);
 };
 
+const closeBranch = async (req, res) => {
+  const employee = req.employee;
+
+  if (employee.userType === "employee")
+    if (employee.branch.toHexString() !== req.params.id)
+      return res
+        .status(400)
+        .send("Looks like you are not related to the given branch.");
+
+  const branch = await Branch.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        isOpen: false,
+      },
+    },
+    { new: true }
+  );
+
+  if (!branch)
+    return res.status(404).send("Looks like the branch cannot be found.");
+
+  res.send(branch);
+};
+
+const openBranch = async (req, res) => {
+  const employee = req.employee;
+
+  if (employee.userType === "employee")
+    if (employee.branch.toHexString() !== req.params.id)
+      return res
+        .status(400)
+        .send("Looks like you are not related to the given branch.");
+
+  const branch = await Branch.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        isOpen: true,
+      },
+    },
+    { new: true }
+  );
+
+  if (!branch)
+    return res.status(404).send("Looks like the branch cannot be found.");
+
+  res.send(branch);
+};
+
 module.exports = {
   createBranch,
   getBranch,
   getBranches,
   updateBranch,
   deleteBranch,
+  closeBranch,
+  openBranch,
 };

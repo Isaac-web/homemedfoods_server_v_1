@@ -18,6 +18,11 @@ const createOrder = async (req, res) => {
   if (!branch) return res.status(404).send("Branch not found.");
   if (!paymentMethod) return res.status(404).send("Payment method not found.");
 
+  if (!branch.isOpen)
+    return res
+      .status(400)
+      .send("Looks like the give store is currently stored.");
+
   let orderItemsTotal = 0;
   const orderItems = req.body.order_items.map((item) => {
     let subtotal = 0;

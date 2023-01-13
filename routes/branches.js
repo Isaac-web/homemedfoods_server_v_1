@@ -14,6 +14,16 @@ router.patch(
   [validateId, auth("admin")],
   errorHander(controller.updateBranch)
 );
+router.patch(
+  "/open/:id",
+  [validateId, auth("manager")],
+  errorHander(controller.openBranch)
+);
+router.patch(
+  "/close/:id",
+  [validateId, auth("manager")],
+  errorHander(controller.closeBranch)
+);
 router.delete(
   "/:id",
   [validateId, auth("admin")],
