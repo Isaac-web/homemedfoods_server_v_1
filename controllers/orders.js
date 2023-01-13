@@ -21,7 +21,7 @@ const createOrder = async (req, res) => {
   if (!branch.isOpen)
     return res
       .status(400)
-      .send("Looks like the give store is currently stored.");
+      .send("Looks like the give store is currently closed.");
 
   let orderItemsTotal = 0;
   const orderItems = req.body.order_items.map((item) => {
