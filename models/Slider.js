@@ -19,6 +19,14 @@ const Slider = mongoose.model(
       trim: true,
       maxlength: 500,
     },
+    showTitle: {
+      type: Boolean, 
+      default: false
+    },
+    showSubtitle: {
+      type: Boolean, 
+      default: false
+    },
     image: {
       url: { type: String, maxlength: 1024 },
       public_id: { type: String, maxlength: 1024 },
@@ -33,6 +41,8 @@ const validate = (slider) => {
     description: Joi.string().min(0).max(500).optional(),
     imageUrl: Joi.string().min(0).max(1024).optional(),
     imagePublicId: Joi.string().min(0).max(1024).optional(),
+    showTitle: Joi.boolean().optional(),
+    showSubtitle: Joi.boolean().optional(),
   });
 
   return schema.validate(slider);
