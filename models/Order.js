@@ -62,11 +62,11 @@ const orderSchema = new mongoose.Schema(
     },
     shopper: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
+      ref: "User",
     },
     rider: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
+      ref: "User",
     },
     order_items: {
       type: [orderItemSchema],

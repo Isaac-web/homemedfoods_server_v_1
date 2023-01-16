@@ -151,7 +151,9 @@ const getOrder = async (req, res) => {
   let order = await Order.findById(req.params.id)
     .populate("customer")
     .populate("branch")
-    .populate("payment_method");
+    .populate("payment_method")
+    .populate("rider")
+    .populate("shopper");
 
   if (!order) return res.status(404).send("Order not found.");
 
@@ -173,6 +175,23 @@ const updateOrderStatus = async (req, res) => {
       "status.value": 1,
     },
   });
+
+  if (!order) return req.status(404).send("Order not found.");
+
+  res.send(order);
+};
+
+const markAsDelivered = async (req, res) => {
+  const order = await Order.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        "status.updated_at": Date.now(),
+        "status.value": 3,
+      },
+    },
+    { new: true }
+  );
 
   if (!order) return req.status(404).send("Order not found.");
 
@@ -222,9 +241,12 @@ const updateOrder = async (req, res) => {
   const { error } = validateOnUpdate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { comment, delivered_at, riderId } = req.body;
+  const { comment, delivered_at, riderId, confirmed_at } = req.body;
 
   const order = await Order.findById(req.params.id);
+
+  if (!order)
+    return res.status(404).send("Looks like the order cannot be found.");
 
   if (comment) order.comment = comment;
   if (delivered_at) order.delivered_at = delivered_at;
@@ -258,7 +280,6 @@ const dispatchOrder = async (req, res) => {
   res.send(order);
 };
 
-
 const deleteOrder = async (req, res) => {
   const order = await Order.findByIdAndRemove(req.params.id);
 
@@ -280,4 +301,5 @@ module.exports = {
   getBranchPendingOrders,
   updateOrderProcess,
   deleteOrder,
+  markAsDelivered,
 };
