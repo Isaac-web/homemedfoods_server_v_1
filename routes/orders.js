@@ -8,6 +8,7 @@ const auth = require("../middleware/auth");
 
 const router = express.Router();
 
+//Hello World
 router.post("/", [customerAuth], errorHandler(controller.createOrder));
 router.get("/", auth("admin"), errorHandler(controller.getOrders));
 router.get(
