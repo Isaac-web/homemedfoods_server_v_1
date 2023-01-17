@@ -4,6 +4,7 @@ const { PaymentMethod } = require("../models/PaymentMethod");
 const { User } = require("../models/User");
 const { CustomerNotification } = require("../models/CustomerNotification");
 const { Coupon } = require("../models/Coupon");
+const { Product } = require("../models/Product");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -23,19 +24,28 @@ const createOrder = async (req, res) => {
       .status(400)
       .send("Looks like the given store is currently closed.");
 
+  const order_item_product_ids = req.body.order_items.map(
+    (item) => item.productId
+  );
+  const order_item_products = await Product.find({
+    $in: order_item_product_ids,
+  }).select("_id name price image");
+
   let orderItemsTotal = 0;
-  const orderItems = req.body.order_items.map((item) => {
+  const orderItems = req.body.order_items.map((item, index) => {
+    const product = order_item_products[index];
+
     let subtotal = 0;
     const orderItem = {
       productId: item.productId,
       productName: item.productName,
-      optionalPrice: item.optionalPrice,
-      unitPrice: item.unitPrice,
-      imageUri: item.imageUri,
+      optionalPrice: item.optionalPrice || null,
+      unitPrice: item.optionalPrice ? null : product.price,
+      imageUri: product.image?.url || null,
       quantity: item.quantity,
       subtotal: (subtotal += item.optionalPrice
         ? item.optionalPrice * item.quantity
-        : item.unitPrice * item.quantity),
+        : product.price * item.quantity),
     };
     orderItemsTotal += subtotal;
     return orderItem;
@@ -88,6 +98,61 @@ const createOrder = async (req, res) => {
   order.orderId = await order.generateOrderId();
 
   await order.save();
+
+  res.send(order);
+};
+
+const getPreCheckOutSummery = async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const [branch, paymentMethod, coupon] = await Promise.all([
+    Branch.findById(req.body.branch),
+    PaymentMethod.findById(req.body.payment_method_id),
+    Coupon.findOne({ code: req.body.couponCode }),
+  ]);
+
+  if (!branch) return res.status(404).send("Branch not found.");
+  if (!paymentMethod) return res.status(404).send("Payment method not found.");
+
+  const order_item_product_ids = req.body.order_items.map(
+    (item) => item.productId
+  );
+  const order_item_products = await Product.find({
+    $in: order_item_product_ids,
+  }).select("_id name price image");
+
+  let orderItemsTotal = 0;
+  const orderItems = req.body.order_items.map((item, index) => {
+    const product = order_item_products[index];
+
+    let subtotal = 0;
+    const orderItem = {
+      productId: item.productId,
+      productName: item.productName,
+      optionalPrice: item.optionalPrice || null,
+      unitPrice: item.optionalPrice ? null : product.price,
+      imageUri: product.image?.url || null,
+      quantity: item.quantity,
+      subtotal: (subtotal += item.optionalPrice
+        ? item.optionalPrice * item.quantity
+        : product.price * item.quantity),
+    };
+    orderItemsTotal += subtotal;
+    return orderItem;
+  });
+
+  const order = new Order({
+    customer: req.customer._id,
+    comment: req.body.comment,
+    order_items: orderItems,
+    delivery_address: req.body.delivery_address,
+    branch: branch,
+    payment_method: paymentMethod,
+    subtotal: orderItemsTotal,
+    deliveryFee: req.body.deliveryFee,
+    total: orderItemsTotal + req.body.deliveryFee,
+  });
 
   res.send(order);
 };
@@ -302,4 +367,5 @@ module.exports = {
   updateOrderProcess,
   deleteOrder,
   markAsDelivered,
+  getPreCheckOutSummery,
 };
