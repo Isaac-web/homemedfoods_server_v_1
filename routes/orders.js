@@ -9,12 +9,18 @@ const auth = require("../middleware/auth");
 const router = express.Router();
 
 router.post("/", [customerAuth], errorHandler(controller.createOrder));
+router.post(
+  "/precheckout_summery",
+  [customerAuth],
+  errorHandler(controller.getPreCheckOutSummery)
+);
 router.get("/", auth("admin"), errorHandler(controller.getOrders));
 router.get(
   "/customer",
   [customerAuth],
   errorHandler(controller.getCustomerOrders)
 );
+
 router.get(
   "/branch",
   auth("mananger"),
