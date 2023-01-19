@@ -27,7 +27,3 @@ require("./startup/connections")(httpServer);
 require("./startup/error")(app);
 
 module.exports = app;
-
-
-const { setCustomerOrdersCount } = require("./utils/test");
-setCustomerOrdersCount();
