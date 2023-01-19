@@ -53,6 +53,11 @@ const customerSchema = new mongoose.Schema({
     maxlength: 1024,
     required: true,
   },
+  ordersCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   points: {
     type: Number,
     min: 0,

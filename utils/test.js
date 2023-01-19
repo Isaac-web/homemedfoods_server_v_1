@@ -1,60 +1,25 @@
-const axios = require("axios");
+const { Customer } = require("../models/Customer");
+const { Order } = require("../models/Order");
 
-const getUsers = async () => {
-  const res = await axios.get("http://alxtakiy.tech/api/users");
-  console.log(res.status);
-  console.log(res.data);
+const fetchCustomers = () => {
+  return Customer.find().select("_id");
 };
 
-const getChecks = async () => {
-  axios.interceptors.request.use((req) => {
-    req.headers["Authorization"] =
-      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY3MzM5MzY0MSwianRpIjoiMzZiMGUyMTItYjY5NS00NTk2LTk1YTctMDQzNDlmNDQ2Y2M3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6NCwibmJmIjoxNjczMzkzNjQxfQ.i4HmlUXiPLjuqUQVZP34-fM7Uh-OKBa-dXdxs8LDVeI";
-    return req;
-  });
-  const res = await axios.get("http://alxtakiy.tech/api/checks");
-  console.log(res.status);
-  console.log(res.data);
+const getCustomerOrdersCount = (customerId) => {
+  return Order.find({ customer: customerId }).count();
 };
 
-const createUser = async () => {
-  try {
-    const res = await axios.post("http://alxtakiy.tech/api/users", {
-      firstname: "Isaac",
-      lastname: "Kanyiti",
-      email: "kanytakiy@gmail.com",
-      phone: "0553039567",
-      password: "password",
-    });
-    console.log(res.status);
-    console.log(res.data);
-  } catch (err) {
-    if (err.response) {
-      console.log(err.response.data);
-    } else {
-      console.log(err.data);
-    }
+const setCustomerOrdersCount = async () => {
+  const customers = await fetchCustomers();
+  for (customer of customers) {
+    const ordersCount = await getCustomerOrdersCount(customer._id);
+    customer.ordersCount = ordersCount;
+    await customer.save();
   }
+
+  console.log("Done...");
 };
 
-const signIn = async () => {
-  try {
-    const res = await axios.post("http://alxtakiy.tech/api/users/login", {
-      email: "kanytakiy@gmail.com",
-      password: "password",
-    });
-    console.log(res.status);
-    console.log(res.data);
-  } catch (err) {
-    if (err.response) {
-      console.log(err.response.data);
-    } else {
-      console.log(err.data);
-    }
-  }
-};
-
-getChecks();
-// getUsers();
-// createUser();
-// signIn();
+module.exports.fetchCustomers = fetchCustomers;
+module.exports.getCustomerOrdersCount = getCustomerOrdersCount;
+module.exports.setCustomerOrdersCount = setCustomerOrdersCount;

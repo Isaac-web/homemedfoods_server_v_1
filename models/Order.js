@@ -82,6 +82,11 @@ const orderSchema = new mongoose.Schema(
       type: deliveryAddressSchema,
       required: true,
     },
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5,
+    },
     branch: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Branch",

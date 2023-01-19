@@ -4,6 +4,7 @@ const { PaymentMethod } = require("../models/PaymentMethod");
 const { User } = require("../models/User");
 const { CustomerNotification } = require("../models/CustomerNotification");
 const { Coupon } = require("../models/Coupon");
+const { Customer } = require("../models/Customer");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -65,11 +66,9 @@ const createOrder = async (req, res) => {
         );
 
     if (new Date(coupon.expiresAt).getTime() < Date.now())
-      // return 400 if coupon is expired.
       return res.status(400).send("The coupon used is expired.");
 
     if (coupon.usedBy.indexOf(req.customer._id) > -1)
-      //return 400 if coupon has already been used.
       return res
         .status(400)
         .send("Looks like the coupon has already been used.");
@@ -87,7 +86,11 @@ const createOrder = async (req, res) => {
 
   order.orderId = await order.generateOrderId();
 
-  await order.save();
+  req.customer.ordersCount = req.customer.ordersCount
+    ? req.customer.ordersCount + 1
+    : 1;
+
+  await Promise.all([order.save(), req.customer.save()]);
 
   res.send(order);
 };
@@ -282,6 +285,12 @@ const dispatchOrder = async (req, res) => {
 
 const deleteOrder = async (req, res) => {
   const order = await Order.findByIdAndRemove(req.params.id);
+  const customer = await Customer.findById(order.customer);
+
+  if (customer) {
+    customer.ordersCount -= 1;
+    await customer.save();
+  }
 
   if (!order) return res.status(404).send("Looks like order cannot be found.");
 
