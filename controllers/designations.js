@@ -1,5 +1,6 @@
 const { Designation, validate } = require("../models/Designation");
 const _ = require("lodash");
+const { User } = require("../models/User");
 
 const createDesignation = async (req, res) => {
   const { error } = validate(req.body);
@@ -35,7 +36,15 @@ const updateDesignation = async (req, res) => {
 };
 
 const deleteDesignation = async (req, res) => {
-  const designation = await Designation.findByIdAndRemove(req.params.id);
+  const [designation, designationUsed] = await Promise.all([
+    Designation.findByIdAndRemove(req.params.id),
+    User.findOne({ designation: req.params.id }),
+  ]);
+
+  if (designationUsed)
+    return res
+      .status(402)
+      .send("The given designation is currently in use and cannot be deleted.");
 
   if (!designation) return res.status(404).send("Designation not found.");
 

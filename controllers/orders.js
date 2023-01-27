@@ -137,6 +137,14 @@ const getBranchOrders = async (req, res) => {
   res.send({ pageSize, orders, ordersCount, currentPage });
 };
 
+const getShopperOrders = async (req, res) => {
+  const orders = await Order.find({
+    shopper: req.employee._id,
+  }).select("-customer -comment");
+
+  res.send(orders);
+};
+
 const getBranchPendingOrders = async (req, res) => {
   const { branch } = req.employee || {};
   const status = req.query.status;
@@ -311,4 +319,5 @@ module.exports = {
   updateOrderProcess,
   deleteOrder,
   markAsDelivered,
+  getShopperOrders,
 };
