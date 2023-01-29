@@ -15,6 +15,7 @@ const coupons = require("../routes/coupons");
 const otp = require("../routes/otp");
 const reports = require("../routes/reports");
 const sliders = require("../routes/sliders");
+const uploads = require("../routes/upload");
 
 module.exports = (app) => {
   app.get("/ping", (req, res) => {
@@ -38,4 +39,5 @@ module.exports = (app) => {
   app.use("/api/otp", otp);
   app.use("/api/reports", reports);
   app.use("/api/sliders", sliders);
+  app.use("/api/uploads", uploads);
 };

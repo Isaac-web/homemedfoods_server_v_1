@@ -140,6 +140,7 @@ const getBranchOrders = async (req, res) => {
 const getShopperOrders = async (req, res) => {
   const orders = await Order.find({
     shopper: req.employee._id,
+    "status.value": 1,
   }).select("-customer -comment");
 
   res.send(orders);
