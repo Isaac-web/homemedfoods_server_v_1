@@ -2,6 +2,7 @@ const express = require("express");
 const { createServer } = require("http");
 const config = require("config");
 const { Customer } = require("./models/Customer");
+const { deleteFile } = require("./utils/awsS3");
 require("dotenv").config();
 
 const app = express();
@@ -25,5 +26,7 @@ require("./startup/middleware")(app);
 require("./startup/routes")(app);
 require("./startup/connections")(httpServer);
 require("./startup/error")(app);
+
+deleteFile({ Key: "products/f1054e26-9b6d-4c1a-b34f-d7ee0e36d121.jpg" });
 
 module.exports = app;

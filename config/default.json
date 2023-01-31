@@ -21,5 +21,9 @@
   },
   "arkesel": {
     "apiKey": "OjZaajgzRTVjbVdwU0xISko="
+  },
+  "awsS3": {
+    "accessKeyId": "",
+    "secretAccessKey": ""
   }
 }

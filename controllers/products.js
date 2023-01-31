@@ -2,6 +2,7 @@ const _ = require("lodash");
 const { Product, validate, validateOnUpdate } = require("../models/Product");
 const { ProductCategory } = require("../models/ProductCategory");
 const { Recipe } = require("../models/Recipe");
+const { deleteFile } = require("../utils/awsS3");
 const uploader = require("../utils/uploader");
 const validateObjectId = require("../utils/validateObjectId");
 
@@ -78,13 +79,13 @@ const updateProduct = async (req, res) => {
 
   if (product?.image?.url && req.body.imageUri) {
     if (product.image.url != req.body.imageUri) {
-      const rawPublicId = product.image.url.split("/").slice(-2).join("/");
-      const _publicId = rawPublicId.split(".")[0];
+      // const rawPublicId = product.image.url.split("/").slice(-2).join("/");
+      // const _publicId = rawPublicId.split(".")[0];
 
       try {
-        await uploader.deleteFile(product.image?.public_id || _publicId);
+        await deleteFile({Key: product.image?.public_id});
       } catch (err) {
-        return res.status(400).send("Oops... could not update product.");
+        // return res.status(400).send("Oops... could not update product.");
       }
     }
   }
@@ -114,11 +115,11 @@ const deleteProduct = async (req, res) => {
   if (product?.image?.url) {
     const rawPublicId = product.image.url.split("/").slice(-2).join("/");
     const _publicId = rawPublicId.split(".")[0];
-    try {
-      await uploader.deleteFile(product.image?.public_id || _publicId);
-    } catch (err) {
-      return res.status(400).send("Oops... could not update product.");
-    }
+    // try {
+    await deleteFile({Key: product.image?.public_id});
+    // } catch (err) {
+    // return res.status(400).send("Oops... could not update product.");
+    // }
   }
 
   //checkif any recipe is linked to this product
