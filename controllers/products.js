@@ -79,8 +79,6 @@ const updateProduct = async (req, res) => {
 
   if (product?.image?.url && req.body.imageUri) {
     if (product.image.url != req.body.imageUri) {
-      // const rawPublicId = product.image.url.split("/").slice(-2).join("/");
-      // const _publicId = rawPublicId.split(".")[0];
 
       try {
         await deleteFile({Key: product.image?.public_id});
@@ -113,18 +111,16 @@ const deleteProduct = async (req, res) => {
   if (!product) return res.status(404).send("Product not found.");
 
   if (product?.image?.url) {
-    const rawPublicId = product.image.url.split("/").slice(-2).join("/");
-    const _publicId = rawPublicId.split(".")[0];
-    // try {
-    await deleteFile({Key: product.image?.public_id});
-    // } catch (err) {
-    // return res.status(400).send("Oops... could not update product.");
-    // }
+    try {
+      await deleteFile({ Key: product.image?.public_id });
+    } catch (err) {
+      // return res.status(400).send("Oops... could not update product.");
+    }
   }
 
   //checkif any recipe is linked to this product
 
-  product.remove();
+  await product.remove();
 
   res.send(product);
 };
