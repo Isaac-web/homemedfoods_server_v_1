@@ -2,6 +2,7 @@ const { Recipe, validate } = require("../models/Recipe");
 const { RecipeCategory } = require("../models/RecipeCategory");
 const { Product } = require("../models/Product");
 const uploader = require("../utils/uploader");
+const { deleteFile } = require("../utils/awsS3");
 
 const createRecipe = async (req, res) => {
   const { error } = validate(req.body);
@@ -101,6 +102,7 @@ const updateRecipe = async (req, res) => {
   recipe.procedure = req.body.procedure;
   recipe.videoUrl = req.body.videoUrl;
   recipe.ratings = req.body.ratings;
+
   if (req.body.imageUrl) recipe.imgaeUrl = req.body.imageUrl;
 
   await recipe.save();
@@ -113,10 +115,17 @@ const deleteRecipe = async (req, res) => {
 
   if (recipe.image.public_id) {
     try {
-      await uploader.deleteFile(recipe.image.public_id)
-    }
-    catch(err){
-      return res.status(500).send("Something went wrong while deleting the recipe.")
+      const result = await deleteFile({
+        Bucket: "digimartstorage",
+        Key: recipe.image.public_id,
+      });
+
+      console.log("Result: ", result);
+    } catch (err) {
+      console.log(err);
+      // return res
+      //   .status(500)
+      //   .send("Something went wrong while deleting the recipe.");
     }
   }
 

@@ -34,6 +34,7 @@ const deleteFile = ({ Bucket = "digimartstorage", Key }) => {
         reject({
           status: false,
           message: "An error occured while deleting the file.",
+          error: err,
         });
       }
 

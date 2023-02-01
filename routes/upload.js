@@ -26,6 +26,18 @@ router.get("/image", async (req, res) => {
   res.send(result);
 });
 
+router.get("/video", async (req, res) => {
+  const { path, extension } = req.query;
 
+  let filename = path ? path + "/" + uuid() : uuid();
+  filename = extension ? `${filename}.${extension}` : `${filename}.mp4`;
+  const result = generateSignedUrl({
+    Bucket: "digimartstorage",
+    Key: filename,
+    ContentType: "video/*",
+  });
+
+  res.send(result);
+});
 
 module.exports = router;
