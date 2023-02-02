@@ -111,6 +111,10 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: false,
     },
+    color: {
+      type: String,
+      maxlength: 128,
+    },
     total: {
       type: Number,
       min: 0,

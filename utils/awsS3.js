@@ -1,6 +1,7 @@
 const config = require("config");
 const AWS = require("aws-sdk");
 
+
 const s3 = new AWS.S3({
   signatureVersion: "v4",
   region: "us-east-1",

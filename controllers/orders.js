@@ -285,7 +285,7 @@ const dispatchOrder = async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) return res.status(404).send("Order not found.");
 
-  order.rider = req.body.riderId;
+  order.color = req.body.color;
   order.status.value = 2;
   order.status.update_at = Date.now();
 
