@@ -102,8 +102,13 @@ const updateRecipe = async (req, res) => {
   recipe.procedure = req.body.procedure;
   recipe.videoUrl = req.body.videoUrl;
   recipe.ratings = req.body.ratings;
+  recipe.video.url = req.body.videoUrl;
+  recipe.video.public_id = req.body.videoPublicId;
 
-  if (req.body.imageUrl) recipe.imgaeUrl = req.body.imageUrl;
+  if (req.body.imageUrl) {
+    recipe.image.url = req.body.imageUrl;
+    recipe.image.public_id = req.body.imagePublicId;
+  }
 
   await recipe.save();
 
