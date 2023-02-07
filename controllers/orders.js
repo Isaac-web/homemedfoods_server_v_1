@@ -289,6 +289,8 @@ const dispatchOrder = async (req, res) => {
   order.status.value = 2;
   order.status.update_at = Date.now();
 
+  await order.save()
+
   res.send(order);
 };
 
