@@ -100,6 +100,9 @@ const userSchema = new mongoose.Schema({
     required: this.userType === "employee",
   },
   lastSeen: Date,
+  device: {
+    token: String,
+  },
 });
 
 userSchema.methods.verifyRequiredData = async function () {
@@ -209,6 +212,7 @@ const validateLogin = (user) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().max(128).required(),
+    notificationToken: Joi.string().optional(),
   });
 
   return schema.validate(user);

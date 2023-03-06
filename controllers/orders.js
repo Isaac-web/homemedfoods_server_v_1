@@ -5,6 +5,7 @@ const { User } = require("../models/User");
 const { CustomerNotification } = require("../models/CustomerNotification");
 const { Coupon } = require("../models/Coupon");
 const { Customer } = require("../models/Customer");
+const { sendPushNotification } = require("../utils/pushNotification");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -245,6 +246,12 @@ const updateOrderProcess = async (req, res) => {
   });
 
   await notification.save();
+
+  await sendPushNotification(
+    shopper.device.token,
+    "Digimart Shopper",
+    "You have one new order."
+  );
 
   res.send(order);
 };

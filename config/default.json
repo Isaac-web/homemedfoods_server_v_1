@@ -25,5 +25,8 @@
   "awsS3": {
     "accessKeyId": "",
     "secretAccessKey": ""
+  },
+  "fcm": {
+    "serverKey": ""
   }
 }

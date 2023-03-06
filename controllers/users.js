@@ -185,8 +185,14 @@ const login = async (req, res) => {
 
   const isValid = await bcrypt.compare(req.body.password, user.password);
   if (!isValid) return res.status(404).send("Invalid username or password.");
+  
+  if (req.body.notificationToken)
+    user.device.token = req.body.notificationToken;
+
+  await user.save();
 
   const token = user.generateAuthToken();
+  
   res.send(token);
 };
 

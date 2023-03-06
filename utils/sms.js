@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const apiKey = process.env.ARKESEL_API_KEY;
+const apiKey = "OjZaajgzRTVjbVdwU0xISko=" || process.env.ARKESEL_API_KEY;
 const api = axios.create({
   baseURL: "https://sms.arkesel.com/api",
   headers: { "api-key": apiKey },
@@ -27,6 +27,7 @@ const sendSms = async (number, message) => {
 
     return res.status;
   } catch (err) {
+    console.log(err);
     if (err.response) return err.response.status;
 
     return 500;

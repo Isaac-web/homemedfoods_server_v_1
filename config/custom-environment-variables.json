@@ -11,5 +11,8 @@
   "awsS3": {
     "accessKeyId": "AWS_S3_ACCESS_KEY_ID",
     "secretAccessKey": "AWS_S3_SECURE_ACCESS_KEY"
+  },
+  "fcm": {
+    "serverKey": "FCM_SERVER_KEY"
   }
 }
