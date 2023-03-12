@@ -3,10 +3,12 @@ const users = require("../controllers/users");
 const errorHandler = require("../middleware/routeErrorHandler");
 const validateId = require("../middleware/validateId");
 const auth = require("../middleware/auth");
+const userAuth = require("../middleware/userAuth");
 
 const router = express.Router();
 
 router.post("/login", errorHandler(users.login));
+router.post("/logout", userAuth, errorHandler(users.logout));
 router.post("/signup", [auth("admin")], errorHandler(users.createUser));
 router.get("/", errorHandler(users.getUsers));
 router.get("/:id", [validateId], errorHandler(users.getUser));

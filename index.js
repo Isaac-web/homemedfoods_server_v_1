@@ -6,8 +6,19 @@ require("dotenv").config();
 
 const app = express();
 
+if (
+  !config.get("fcm.digimartShopperServerKey") &&
+  !config.get("fcm.digimartRiderServerKey") &&
+  !config.get("fcm.digimartCustomerServerKey")
+) {
+  throw new Error(
+    "SHOPPER_FCM_SERVER_KEY, RIDER_FCM_SERVER_KEY or CUSTOMER_FCM_SERVER_KEY cannot be null."
+  );
+}
+
 process.on("uncaughtException", (err) => {
   console.log(err.message, err);
+  process.exit(1);
 });
 process.on("unhandledRejection", (err) => {
   throw new Error(err);

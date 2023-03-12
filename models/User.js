@@ -100,9 +100,12 @@ const userSchema = new mongoose.Schema({
     required: this.userType === "employee",
   },
   lastSeen: Date,
-  device: {
-    token: String,
-  },
+  devices: [
+    {
+      token: String,
+      pushNotificationServerKey: String,
+    },
+  ],
 });
 
 userSchema.methods.verifyRequiredData = async function () {
@@ -213,6 +216,15 @@ const validateLogin = (user) => {
     email: Joi.string().email().required(),
     password: Joi.string().max(128).required(),
     notificationToken: Joi.string().optional(),
+    pushNotificationServerKey: Joi.string().optional().min(0),
+  });
+
+  return schema.validate(user);
+};
+
+const validateLogout = (user) => {
+  const schema = Joi.object({
+    notificationToken: Joi.string().optional(),
   });
 
   return schema.validate(user);
@@ -221,6 +233,7 @@ const validateLogin = (user) => {
 exports.User = User;
 exports.validate = validate;
 exports.validateLogin = validateLogin;
+exports.validateLogout = validateLogout;
 exports.validateOnUpdate = validateOnUpdate;
 exports.validateSystemUser = validateSystemUser;
 exports.validateSystemUserOnUpdate = validateSystemUserOnUpdate;

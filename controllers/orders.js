@@ -1,3 +1,4 @@
+const config = require("config");
 const { Branch } = require("../models/Branch");
 const { Order, validate, validateOnUpdate } = require("../models/Order");
 const { PaymentMethod } = require("../models/PaymentMethod");
@@ -247,11 +248,14 @@ const updateOrderProcess = async (req, res) => {
 
   await notification.save();
 
-  await sendPushNotification(
-    shopper.device.token,
-    "Digimart Shopper",
-    "You have one new order."
-  );
+  shopper.devices.map(async (d) => {
+    await sendPushNotification(
+      d.token, // device token
+      "Digimart Shopper", // message title
+      "You have one new order.", // message content
+      config.get(d.pushNotificationServerKey) // which push notification server to use.
+    );
+  });
 
   res.send(order);
 };
@@ -296,7 +300,7 @@ const dispatchOrder = async (req, res) => {
   order.status.value = 2;
   order.status.update_at = Date.now();
 
-  await order.save()
+  await order.save();
 
   res.send(order);
 };

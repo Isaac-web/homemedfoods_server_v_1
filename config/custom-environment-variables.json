@@ -13,6 +13,9 @@
     "secretAccessKey": "AWS_S3_SECURE_ACCESS_KEY"
   },
   "fcm": {
-    "serverKey": "FCM_SERVER_KEY"
+    "digimartShopperServerKey": "SHOPPER_FCM_SERVER_KEY",
+    "digimartRiderServerKey": "RIDER_FCM_SERVER_KEY",
+    "digimartCustomerServerKey": "CUSTOMER_FCM_SERVER_KEY",
+    "digimartDashboardServerKey": "DASHBOARD_FCM_SERVER_KEY"
   }
 }

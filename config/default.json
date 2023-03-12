@@ -27,6 +27,14 @@
     "secretAccessKey": ""
   },
   "fcm": {
-    "serverKey": ""
+    "shopperAppServerKey": "",
+    "RiderAppServerKey": "",
+    "CustomerAppServerKey": ""
+  }, 
+  "appNames": {
+    "digimartShopper":"",
+    "digimartRider": "",
+    "digimartCustomer": "",
+    "digimartWeb": ""  
   }
 }

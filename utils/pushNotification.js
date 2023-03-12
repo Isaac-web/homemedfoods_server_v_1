@@ -1,9 +1,15 @@
 const FCM = require("fcm-node");
 const config = require("config");
 
-var fcm = new FCM(config.get("fcm.serverKey"));
 
-module.exports.sendPushNotification = async (to, title, message) => {
+
+module.exports.sendPushNotification = async (
+  to,
+  title,
+  message,
+  appName = "Digimart"
+) => {
+  const fcm = new FCM(getFCMServerKey(appName));
   const messageObject = {
     to,
     notification: {
@@ -21,6 +27,17 @@ module.exports.sendPushNotification = async (to, title, message) => {
   try {
     await fcm.send(messageObject);
   } catch (err) {
-    console.log("There was an error.");
+    // console.log("There was an error.");
+  }
+};
+
+const getFCMServerKey = (appName) => {
+  switch (appName) {
+    case "DigimartShopper":
+      return config.get("fcm.shopperAppServerKey");
+    case "DigimartRider":
+      return config.get("riderAppServerKey");
+    case "Digimart":
+      return config.get("customerAppServerKey");
   }
 };

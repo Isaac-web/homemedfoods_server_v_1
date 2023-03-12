@@ -5,6 +5,7 @@ const {
   validateLogin,
   validateOnUpdate,
   validateSystemUserOnUpdate,
+  validateLogout,
 } = require("../models/User");
 const bcrypt = require("bcrypt");
 const { Branch } = require("../models/Branch");
@@ -185,15 +186,36 @@ const login = async (req, res) => {
 
   const isValid = await bcrypt.compare(req.body.password, user.password);
   if (!isValid) return res.status(404).send("Invalid username or password.");
-  
+
   if (req.body.notificationToken)
-    user.device.token = req.body.notificationToken;
+    user.devices.push({
+      token: req.body.notificationToken,
+      pushNotificationServerKey: req.body.pushNotificationServerKey || null,
+    });
 
   await user.save();
 
   const token = user.generateAuthToken();
-  
+
   res.send(token);
+};
+
+const logout = async (req, res) => {
+  const { error } = validateLogout(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const user = await User.findById(req.user._id);
+  if (!user)
+    return res.status(404).send("Looks like the user cannot be found.");
+
+  const index = user.devices.findIndex(
+    (device) => device.token === req.body.notificationToken
+  );
+  user.devices.splice(index, 1);
+
+  await user.save();
+
+  return res.send({ message: "Logout was successful." });
 };
 
 module.exports.createUser = createUser;
@@ -202,3 +224,5 @@ module.exports.getUser = getUser;
 module.exports.updateUser = updateUser;
 module.exports.deleteUser = deleteUser;
 module.exports.login = login;
+module.exports.logout = logout;
+
