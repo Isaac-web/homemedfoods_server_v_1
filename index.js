@@ -6,11 +6,9 @@ require("dotenv").config();
 
 const app = express();
 
-if (
-  !config.get("fcm.digimartShopperServerKey") &&
-  !config.get("fcm.digimartRiderServerKey") &&
-  !config.get("fcm.digimartCustomerServerKey")
-) {
+// config.get("fcm.digimartShopperServerKey") &&
+// config.get("fcm.digimartRiderServerKey")
+if (!config.get("fcm.digimartCustomerServerKey")) {
   throw new Error(
     "SHOPPER_FCM_SERVER_KEY, RIDER_FCM_SERVER_KEY or CUSTOMER_FCM_SERVER_KEY cannot be null."
   );

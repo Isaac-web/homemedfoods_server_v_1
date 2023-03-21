@@ -1,43 +1,23 @@
 const FCM = require("fcm-node");
-const config = require("config");
 
+const sendPushNotification = ({ to, title, message, serverKey }) => {
+  const fcm = new FCM(serverKey);
 
-
-module.exports.sendPushNotification = async (
-  to,
-  title,
-  message,
-  appName = "Digimart"
-) => {
-  const fcm = new FCM(getFCMServerKey(appName));
-  const messageObject = {
+  const pushScription = {
     to,
     notification: {
       title,
-      body: `{${message}}`,
-    },
-
-    data: {
-      //you can send only notification or only data(or include both)
-      title: "ok cdfsdsdfsd",
-      body: '{"name" : "okg ooggle ogrlrl","product_id" : "123","final_price" : "0.00035"}',
+      body: message,
     },
   };
 
-  try {
-    await fcm.send(messageObject);
-  } catch (err) {
-    // console.log("There was an error.");
-  }
+  return new Promise((resolve, reject) => {
+    fcm.send(pushScription, (err, res) => {
+      if (err) reject(err);
+
+      resolve(res);
+    });
+  });
 };
 
-const getFCMServerKey = (appName) => {
-  switch (appName) {
-    case "DigimartShopper":
-      return config.get("fcm.shopperAppServerKey");
-    case "DigimartRider":
-      return config.get("riderAppServerKey");
-    case "Digimart":
-      return config.get("customerAppServerKey");
-  }
-};
+module.exports.sendPushNotification = sendPushNotification;
