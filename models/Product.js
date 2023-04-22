@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     min: 0,
-    max: 1000,
+    max: 5000,
     required: true,
   },
   unit: {
@@ -56,7 +56,7 @@ const validate = (product) => {
     name: Joi.string().min(2).max(256).required(),
     desc: Joi.string().max(1024),
     categoryId: Joi.objectId().required(),
-    price: Joi.number().min(0).max(1000).required(),
+    price: Joi.number().min(0).max(5000).required(),
     unit: Joi.string().min(0).max(1024),
     priceFixed: Joi.boolean(),
     imageUri: Joi.string().max(1024),
@@ -73,7 +73,7 @@ const validateOnUpdate = (product) => {
     name: Joi.string().min(2).max(256),
     desc: Joi.string().max(1024),
     categoryId: Joi.objectId(),
-    price: Joi.number().min(0).max(1000),
+    price: Joi.number().min(0).max(5000),
     unit: Joi.string().min(0).max(1024),
     priceFixed: Joi.boolean(),
     imageUri: Joi.string().max(1024),

@@ -63,6 +63,14 @@ const customerSchema = new mongoose.Schema({
     min: 0,
     default: 0,
   },
+  devices: [
+    {
+      notificationData: {
+        token: String,
+        appName: String,
+      },
+    },
+  ],
 });
 
 customerSchema.methods.generateAuthToken = function () {
@@ -82,6 +90,8 @@ const validate = (customer) => {
     phone: Joi.string().min(3).max(15).required(),
     password: Joi.string().min(7).max(150).required(),
     confirmPassword: Joi.string().min(7).max(150).required(),
+    notificationToken: Joi.string().min(0).optional(),
+    appName: Joi.string().min(0).max(100).optional(),
   });
 
   return schema.validate(customer);
@@ -102,6 +112,8 @@ const validateAuth = (user) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(7).max(150).required(),
+    notificationToken: Joi.string().min(0).optional(),
+    appName: Joi.string().min(0).max(100).optional(),
   });
 
   return schema.validate(user);

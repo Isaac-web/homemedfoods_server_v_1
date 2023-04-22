@@ -6,7 +6,10 @@ const { User } = require("../models/User");
 const { CustomerNotification } = require("../models/CustomerNotification");
 const { Coupon } = require("../models/Coupon");
 const { Customer } = require("../models/Customer");
-const { sendPushNotification } = require("../utils/pushNotification");
+const {
+  sendPushNotification,
+  getServerKey,
+} = require("../utils/pushNotification");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -215,12 +218,16 @@ const markAsDelivered = async (req, res) => {
 const updateOrderProcess = async (req, res) => {
   if (!req.body.shopperId)
     return res.status(400).send("shopperId is required.");
+
   if (!req.body.riderId) return res.status(400).send("riderId is required.");
 
-  const shopper = await User.findById(req.body.shopperId);
+  const [shopper, rider] = await Promise.all([
+    User.findById(req.body.shopperId),
+    User.findById(req.body.riderId),
+  ]);
+
   if (!shopper)
     return res.status(404).send("Looks like the shopper cannot be found.");
-  const rider = await User.findById(req.body.riderId);
   if (!rider)
     return res.status(404).send("Looks like the rider cannot be found.");
 
@@ -242,21 +249,25 @@ const updateOrderProcess = async (req, res) => {
 
   const notification = new CustomerNotification({
     userId: order.customer,
-    title: "Status Update",
-    text: "Your order is being processed. It will get to you soon. Thank you for shopping with us.",
+    title: "Digimart",
+    text: `Your order is being processed. \nOrder Id: ${order.orderId}.`,
   });
+
+  const customer = await Customer.findById(order.customer);
+  const { token, appName } = customer.devices[0]?.notificationData || {};
+
+  if (token && appName) {
+    sendPushNotification({
+      token: token,
+      title: notification.title,
+      message: notification.text,
+      serverKey: getServerKey(appName),
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
 
   await notification.save();
-
-  shopper.devices.map(async (d) => {
-    await sendPushNotification(
-      d.token, // device token
-      "Digimart Shopper", // message title
-      "You have one new order.", // message content
-      config.get(d.pushNotificationServerKey) // which push notification server to use.
-    );
-  });
-
   res.send(order);
 };
 

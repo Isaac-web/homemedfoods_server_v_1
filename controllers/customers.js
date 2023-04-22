@@ -35,6 +35,14 @@ const register = async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
   customer.password = hashedPassword;
 
+  if (req.body.notificationToken) {
+    customer.devices.push({
+      notificationData: {
+        token: req.body.notificationToken,
+      },
+    });
+  }
+
   //generate and send otp to user
   const otp = OTP({ phone: customer.phone });
 
@@ -61,6 +69,25 @@ const login = async (req, res) => {
     customer.password
   );
   if (!validPassword) return res.status(400).send("Invalid email or password.");
+
+  if (req.body.notificationToken) {
+    if (customer.devices && customer.devices.length)
+      customer.devices[0].notificationData = {
+        token: req.body.notificationToken,
+        appName: req.body.appName,
+      };
+    else {
+      customer.devices = [
+        {
+          notificationData: {
+            token: req.body.notificationToken,
+            appName: req.body.appName,
+          },
+        },
+      ];
+    }
+  }
+  await customer.save();
 
   const token = customer.generateAuthToken();
   res.json({ token });
