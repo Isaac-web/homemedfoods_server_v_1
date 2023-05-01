@@ -1,5 +1,5 @@
 {
-  "db": "mongodb://localhost/home_med_dev",
+  "db": "mongodb://0.0.0.0/home_med_dev",
   "port": 9000,
   "arkesel": {
     "apiKey": "OjZaajgzRTVjbVdwU0xISko="

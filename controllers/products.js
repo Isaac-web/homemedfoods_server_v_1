@@ -3,7 +3,6 @@ const { Product, validate, validateOnUpdate } = require("../models/Product");
 const { ProductCategory } = require("../models/ProductCategory");
 const { Recipe } = require("../models/Recipe");
 const { deleteFile } = require("../utils/awsS3");
-const uploader = require("../utils/uploader");
 const validateObjectId = require("../utils/validateObjectId");
 
 const createProduct = async (req, res) => {
