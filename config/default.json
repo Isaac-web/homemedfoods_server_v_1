@@ -30,11 +30,21 @@
     "shopperAppServerKey": "",
     "RiderAppServerKey": "",
     "CustomerAppServerKey": ""
-  }, 
+  },
   "appNames": {
-    "digimartShopper":"",
+    "digimartShopper": "",
     "digimartRider": "",
     "digimartCustomer": "",
-    "digimartWeb": ""  
+    "digimartWeb": ""
+  },
+  "system": {
+    "mobile": {
+      "version": {
+        "base": "1.0.0",
+        "stable": "1.0.0",
+        "current": "1.0.0",
+        "beta": "1.0.0"
+      }
+    }
   }
 }

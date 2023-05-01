@@ -16,6 +16,7 @@ const reports = require("../routes/reports");
 const sliders = require("../routes/sliders");
 const uploads = require("../routes/upload");
 const notifications = require("../routes/notifications");
+const system = require("../routes/system");
 
 module.exports = (app) => {
   app.get("/ping", (req, res) => {
@@ -40,4 +41,5 @@ module.exports = (app) => {
   app.use("/api/reports", reports);
   app.use("/api/sliders", sliders);
   app.use("/api/uploads", uploads);
+  app.use("/api/system", system);
 };
