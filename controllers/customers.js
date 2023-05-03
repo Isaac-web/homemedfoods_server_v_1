@@ -68,6 +68,7 @@ const login = async (req, res) => {
     req.body.password,
     customer.password
   );
+
   if (!validPassword) return res.status(400).send("Invalid email or password.");
 
   if (req.body.notificationToken) {

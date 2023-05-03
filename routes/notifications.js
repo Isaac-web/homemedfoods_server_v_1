@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const express = require("express");
-const { sendPushNotification } = require("../utils/pushNotification");
+const { sendPushNotification, getServerKey } = require("../utils/pushNotification");
 
 const router = express.Router();
 
@@ -9,6 +9,7 @@ const validate = (notification) => {
     to: Joi.string().required(),
     title: Joi.string().required(),
     message: Joi.string().required(),
+    appName: Joi.string().required(),
   });
 
   return schema.validate(notification);
@@ -17,38 +18,27 @@ router.post("/send", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-<<<<<<< HEAD
-  const response = await sendPushNotification({
-    token: req.body.to,
-    title: req.body.title,
-    message: req.body.message,
-    serverKey: req.body.serverKey,
-  });
-=======
   try {
-    const serverKey = process.env.CUSTOMER_FCM_SERVER_KEY;
     const response = await sendPushNotification({
-      to: req.body.to,
+      token: req.body.to,
       title: req.body.title,
       message: req.body.message,
-      serverKey,
+      serverKey: getServerKey(req.body.appName),
     });
     res.send(
       {
-        message: "Notification was successfully sent",
+        message: "Notification was successfully sent.",
         payload: response
       }
     );
   } catch (error) {
     res.send(
       {
-        message: "Failed to send notification",
+        message: "Failed to send notification.",
         error
       }
     );
   }
->>>>>>> notification
-
 });
 
 module.exports = router;
