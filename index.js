@@ -1,7 +1,6 @@
 const express = require("express");
 const { createServer } = require("http");
 const config = require("config");
-const { Customer } = require("./models/Customer");
 require("dotenv").config();
 
 const app = express();
