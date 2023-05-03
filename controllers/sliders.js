@@ -1,5 +1,4 @@
 const { Slider, validate } = require("../models/Slider");
-const { deleteFile } = require("../utils/uploader");
 
 const createSlider = async (req, res) => {
   const { error } = validate(req.body);

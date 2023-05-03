@@ -1,7 +1,6 @@
 const { Recipe, validate } = require("../models/Recipe");
 const { RecipeCategory } = require("../models/RecipeCategory");
 const { Product } = require("../models/Product");
-const uploader = require("../utils/uploader");
 const { deleteFile } = require("../utils/awsS3");
 
 const createRecipe = async (req, res) => {
