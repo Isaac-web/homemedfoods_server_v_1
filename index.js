@@ -6,13 +6,12 @@ require("dotenv").config();
 
 const app = express();
 
-// config.get("fcm.digimartShopperServerKey") &&
-// config.get("fcm.digimartRiderServerKey")
-// if (!config.get("fcm.digimartCustomerServerKey")) {
-//   throw new Error(
-//     "SHOPPER_FCM_SERVER_KEY, RIDER_FCM_SERVER_KEY or CUSTOMER_FCM_SERVER_KEY cannot be null."
-//   );
-// }
+
+if (!config.get("fcm.digimartCustomerServerKey")) {
+  throw new Error(
+    "SHOPPER_FCM_SERVER_KEY, RIDER_FCM_SERVER_KEY or CUSTOMER_FCM_SERVER_KEY cannot be null."
+  );
+}
 
 process.on("uncaughtException", (err) => {
   console.log(err.message, err);
@@ -34,6 +33,7 @@ require("./startup/middleware")(app);
 require("./startup/routes")(app);
 require("./startup/connections")(httpServer);
 require("./startup/error")(app);
+
 
 
 module.exports = app;

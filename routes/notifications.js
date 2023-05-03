@@ -9,7 +9,6 @@ const validate = (notification) => {
     to: Joi.string().required(),
     title: Joi.string().required(),
     message: Joi.string().required(),
-    serverKey: Joi.string().required(),
   });
 
   return schema.validate(notification);
@@ -18,14 +17,29 @@ router.post("/send", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const response = await sendPushNotification({
-    to: req.body.to,
-    title: req.body.title,
-    message: req.body.message,
-    serverKey: req.body.serverKey,
-  });
+  try {
+    const serverKey = process.env.CUSTOMER_FCM_SERVER_KEY;
+    const response = await sendPushNotification({
+      to: req.body.to,
+      title: req.body.title,
+      message: req.body.message,
+      serverKey,
+    });
+    res.send(
+      {
+        message: "Notification was successfully sent",
+        payload: response
+      }
+    );
+  } catch (error) {
+    res.send(
+      {
+        message: "Failed to send notification",
+        error
+      }
+    );
+  }
 
-  res.send(response);
 });
 
 module.exports = router;
