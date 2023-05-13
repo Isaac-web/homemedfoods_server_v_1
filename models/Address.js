@@ -8,6 +8,22 @@ const addressSchema = new mongoose.Schema({
     createIndex: true,
     required: true,
   },
+  city: {
+    type: String,
+    maxlength: 150,
+    minlength: 2,
+    required: true,
+  },
+  locality: {
+    type: String,
+    minlength: 2,
+    maxlength: 150,
+  },
+  subLocality: {
+    type: String,
+    minlength: 3,
+    maxlength: 256,
+  },
   coordinates: {
     lat: {
       type: Number,
@@ -18,25 +34,9 @@ const addressSchema = new mongoose.Schema({
       required: true,
     },
   },
-  area: {
-    type: String,
-    maxlength: 150,
-    minlength: 2,
-    required: true,
-  },
   digitalAddress: {
     type: String,
     maxlength: 150,
-  },
-  street: {
-    type: String,
-    minlength: 2,
-    maxlength: 150,
-  },
-  formattedAddress: {
-    type: String,
-    minlength: 3,
-    maxlength: 256,
   },
 });
 
@@ -48,10 +48,10 @@ const validate = (address) => {
       lat: Joi.number().required(),
       long: Joi.number().required(),
     }).required(),
-    area: Joi.string().min(2).max(150).required(),
+    city: Joi.string().min(2).max(150).required(),
+    locality: Joi.string().max(150),
+    subLocality: Joi.string().min(3).max(256),
     digitalAddress: Joi.string().max(150),
-    street: Joi.string().max(150),
-    formattedAddress: Joi.string().min(3).max(256),
   });
 
   return schema.validate(address);
@@ -63,10 +63,10 @@ const validateOnUpdate = (address) => {
       lat: Joi.number(),
       long: Joi.number(),
     }),
-    area: Joi.string().min(2).max(150),
-    digitalAddress: Joi.string().max(150),
-    street: Joi.string().max(150),
-    formattedAddress: Joi.string().min(3).max(256),
+    city: Joi.string().min(2).max(150),
+    locality: Joi.string().max(150),
+    subLocality: Joi.string().max(150),
+    digitalAddress: Joi.string().min(3).max(256),
   });
 
   return schema.validate(address);

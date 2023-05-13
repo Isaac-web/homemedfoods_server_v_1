@@ -1,4 +1,3 @@
-const { response } = require("express");
 const { Branch, validate, validateOnUpdate } = require("../models/Branch");
 
 const createBranch = async (req, res) => {

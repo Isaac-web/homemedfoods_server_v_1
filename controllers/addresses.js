@@ -6,7 +6,7 @@ const createAddress = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const address = new Address(
-    _.pick(req.body, ["coordinates", "area", "digitalAddress"])
+    _.pick(req.body, ["coordinates", "city", "locality", "subLocality", "digitalAddress"])
   );
 
   address.userId = req.customer._id;
@@ -18,8 +18,10 @@ const createAddress = async (req, res) => {
 
 const getAddresses = async (req, res) => {
   const address = await Address.find({ userId: req.customer._id });
+
   res.send(address);
 };
+
 
 const updateAddress = async (req, res) => {
   const { error } = validateOnUpdate(req.body);
@@ -28,7 +30,7 @@ const updateAddress = async (req, res) => {
   const address = await Address.findByIdAndUpdate(
     req.params.id,
     {
-      $set: _.pick(req.body, ["coordinates", "area", "area", "digitalAddress"]),
+      $set: _.pick(req.body, ["coordinates", "city", "locality", "subLocality", "digitalAddress"]),
     },
     { new: true }
   );
