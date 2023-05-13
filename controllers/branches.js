@@ -31,7 +31,10 @@ const getBranch = async (req, res) => {
 };
 
 const getBranches = async (req, res) => {
-  const branches = await Branch.find();
+  const filter = {};
+  if (req.query.name) filter.name = new RegExp(req.query.name, 'i');
+
+  const branches = await Branch.find(filter);
 
   res.send(branches);
 };

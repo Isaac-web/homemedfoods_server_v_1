@@ -16,5 +16,8 @@ require("./startup/routes")(app); //api routes
 require("./startup/connections")(app); //port and db connection
 require("./startup/error")(app); //error catching mechanism in api routes
 
+// require("./utils/sendCustomerSms")();
+// "db": "mongodb://0.0.0.0/home_med_dev",
+
 
 module.exports = app;

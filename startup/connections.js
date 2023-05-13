@@ -3,7 +3,7 @@ const debugdb = require("debug")("db");
 const mongoose = require("mongoose");
 
 module.exports = (app) => {
-  const port = process.env.PORT || config.get("port");
+  const port = process.env.PORT || config.get("port")
 
   mongoose
     .connect(config.get("db"))
