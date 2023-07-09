@@ -4,9 +4,7 @@ const { Customer } = require("../models/Customer");
 
 console.log("Connecting to mongodb....");
 mongoose
-  .connect(
-    "mongodb+srv://digimart:2W874t9kNB3u6ej5@digimart-db-storage-46ab3fcb.mongo.ondigitalocean.com/digimart?authSource=admin&replicaSet=digimart-db-storage&readPreference=primary&appname=MongoDB%20Compass&ssl=true"
-  )
+  .connect("")
   .then(() => {
     console.log("Connected to mongodb....");
     fetchCustomers();

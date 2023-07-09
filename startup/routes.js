@@ -1,5 +1,6 @@
 const addresses = require("./../routes/addresses");
 const customers = require("./../routes/customers");
+const cart = require("./../routes/cart");
 const discounts = require("./../routes/discounts");
 const orders = require("../routes/orders");
 const paymentMethods = require("../routes/paymentMethods");
@@ -17,6 +18,8 @@ const sliders = require("../routes/sliders");
 const uploads = require("../routes/upload");
 const notifications = require("../routes/notifications");
 const system = require("../routes/system");
+
+
 
 module.exports = (app) => {
   app.get("/ping", (req, res) => {
@@ -42,4 +45,5 @@ module.exports = (app) => {
   app.use("/api/sliders", sliders);
   app.use("/api/uploads", uploads);
   app.use("/api/system", system);
+  app.use("/api/cart", cart)
 };

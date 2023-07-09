@@ -44,6 +44,7 @@
     "moment": "^2.29.3",
     "mongoose": "^6.3.5",
     "nodemailer": "^6.7.5",
+    "paystack": "^2.0.1",
     "socket.io": "^4.5.4",
     "swagger-ui-express": "^4.5.0",
     "uuid": "^9.0.0",

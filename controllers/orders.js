@@ -10,6 +10,7 @@ const {
   sendPushNotification,
   getServerKey,
 } = require("../utils/pushNotification");
+const { OrderPayamentInfo } = require("../models/OrderPaymentInfo");
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -330,6 +331,32 @@ const deleteOrder = async (req, res) => {
   res.send(order);
 };
 
+
+const createOrderOnPayment = async (req, res) => {
+  const { reference } = req.body;
+
+  const orderPaymentInfo = await OrderPayamentInfo.findOne({ reference });
+
+  const order = new Order({
+    customer: orderPaymentInfo.customer,
+    comment: orderPaymentInfo.comment,
+    order_items: orderPaymentInfo.items,
+    delivery_address: orderPaymentInfo.deliveryAddress,
+    branch: orderPaymentInfo.branch,
+    payment_method: orderPaymentInfo.paymentMethod,
+    subtotal: orderPaymentInfo.subtotal,
+    deliveryFee: orderPaymentInfo.deliveryFee,
+    total: orderPaymentInfo.total,
+  });
+
+  await order.save();
+
+  await orderPaymentInfo.remove();
+
+  res.send({ message: "Your order has been placed.", order });
+}
+
+
 module.exports = {
   createOrder,
   dispatchOrder,
@@ -345,4 +372,5 @@ module.exports = {
   deleteOrder,
   markAsDelivered,
   getShopperOrders,
+  createOrderOnPayment,
 };

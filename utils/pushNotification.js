@@ -8,10 +8,6 @@ const sendPushNotification = ({ token, title, message, serverKey }) => {
   if (!message) throw new Error("'message' is required.");
   if (!serverKey) throw new Error("'serverKey' was not provided.");
 
-  // console.log(token, title, message, serverKey);
-  // console.log(title);
-  // console.log(message);
-  // console.log(serverKey);
 
   //initialize firebase cloud messaging
   const fcm = new FCM(serverKey);
