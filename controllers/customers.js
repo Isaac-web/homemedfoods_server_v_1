@@ -1,16 +1,16 @@
-const _ = require("lodash");
-const bcrypt = require("bcrypt");
+const _ = require('lodash');
+const bcrypt = require('bcrypt');
 const {
   Customer,
   validate,
   validateAuth,
   validateOnUpdate,
   validateOnResetPassword,
-} = require("../models/Customer");
-const { CustomerNotification } = require("../models/CustomerNotification");
-const { Order } = require("../models/Order");
-const { OTP } = require("../models/OTP");
-const { sendSms } = require("../utils/sms");
+} = require('../models/Customer');
+const { CustomerNotification } = require('../models/CustomerNotification');
+const { Order } = require('../models/Order');
+const { OTP } = require('../models/OTP');
+const { sendSms } = require('../utils/sms');
 
 const register = async (req, res) => {
   //For now, email customer will be logged in automatically
@@ -21,13 +21,13 @@ const register = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   if (req.body.password !== req.body.confirmPassword)
-    return res.status(400).send("Passwords donnot match.");
+    return res.status(400).send('Passwords donnot match.');
 
   let customer = await Customer.findOne({ email: req.body.email });
-  if (customer) return res.status(400).send("Email is already taken.");
+  if (customer) return res.status(400).send('Email is already taken.');
 
   customer = new Customer(
-    _.pick(req.body, ["firstname", "lastname", "phone", "email"])
+    _.pick(req.body, ['firstname', 'lastname', 'phone', 'email'])
   );
 
   //hash password
@@ -54,7 +54,7 @@ const register = async (req, res) => {
 
   customer.password = undefined;
   const token = customer.generateAuthToken();
-  res.header("x-auth-token", token).send(customer);
+  res.header('x-auth-token', token).send(customer);
 };
 
 const login = async (req, res) => {
@@ -62,14 +62,14 @@ const login = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const customer = await Customer.findOne({ email: req.body.email });
-  if (!customer) return res.status(404).send("Invalid email or password.");
+  if (!customer) return res.status(404).send('Invalid email or password.');
 
   const validPassword = await bcrypt.compare(
     req.body.password,
     customer.password
   );
 
-  if (!validPassword) return res.status(400).send("Invalid email or password.");
+  if (!validPassword) return res.status(400).send('Invalid email or password.');
 
   if (req.body.notificationToken) {
     if (customer.devices && customer.devices.length)
@@ -90,8 +90,10 @@ const login = async (req, res) => {
   }
   await customer.save();
 
+  customer.password = undefined;
+
   const token = customer.generateAuthToken();
-  res.json({ token });
+  res.json({ token, customer });
 };
 
 const getCustomers = async (req, res) => {
@@ -101,7 +103,7 @@ const getCustomers = async (req, res) => {
   if (name) {
     filter = {
       ...filter,
-      $or: [{ firstname: RegExp(name, "i") }, { lastname: RegExp(name, "i") }],
+      $or: [{ firstname: RegExp(name, 'i') }, { lastname: RegExp(name, 'i') }],
     };
   }
 
@@ -115,7 +117,7 @@ const getCustomers = async (req, res) => {
 
 const getCustomer = async (req, res) => {
   const customer = await Customer.findById(req.customer._id);
-  if (!customer) return res.status(404).send("Customer not found.");
+  if (!customer) return res.status(404).send('Customer not found.');
 
   res.send(customer);
 };
@@ -136,7 +138,7 @@ const updateCustomer = async (req, res) => {
     { new: true }
   );
 
-  if (!customer) return res.status(404).send("Customer not found.");
+  if (!customer) return res.status(404).send('Customer not found.');
 
   res.send(customer);
 };
@@ -146,7 +148,7 @@ const resetPassword = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   if (req.body.password !== req.body.confirmPassword)
-    return res.status(400).send("Passwords donnot match.");
+    return res.status(400).send('Passwords donnot match.');
 
   const salt = await bcrypt.genSalt(12);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -157,7 +159,7 @@ const resetPassword = async (req, res) => {
     },
   });
 
-  res.send({ message: "Password has been updated." });
+  res.send({ message: 'Password has been updated.' });
 };
 
 const deleteCustomer = async (req, res) => {

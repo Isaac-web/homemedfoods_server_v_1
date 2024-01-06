@@ -1,16 +1,16 @@
-const config = require("config");
-const { Branch } = require("../models/Branch");
-const { Order, validate, validateOnUpdate } = require("../models/Order");
-const { PaymentMethod } = require("../models/PaymentMethod");
-const { User } = require("../models/User");
-const { CustomerNotification } = require("../models/CustomerNotification");
-const { Coupon } = require("../models/Coupon");
-const { Customer } = require("../models/Customer");
+const config = require('config');
+const { Branch } = require('../models/Branch');
+const { Order, validate, validateOnUpdate } = require('../models/Order');
+const { PaymentMethod } = require('../models/PaymentMethod');
+const { User } = require('../models/User');
+const { CustomerNotification } = require('../models/CustomerNotification');
+const { Coupon } = require('../models/Coupon');
+const { Customer } = require('../models/Customer');
 const {
   sendPushNotification,
   getServerKey,
-} = require("../utils/pushNotification");
-const { OrderPayamentInfo } = require("../models/OrderPaymentInfo");
+} = require('../utils/pushNotification');
+const { OrderPayamentInfo } = require('../models/OrderPaymentInfo');
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -22,13 +22,13 @@ const createOrder = async (req, res) => {
     Coupon.findOne({ code: req.body.couponCode }),
   ]);
 
-  if (!branch) return res.status(404).send("Branch not found.");
-  if (!paymentMethod) return res.status(404).send("Payment method not found.");
+  if (!branch) return res.status(404).send('Branch not found.');
+  if (!paymentMethod) return res.status(404).send('Payment method not found.');
 
   if (!branch.isOpen)
     return res
       .status(400)
-      .send("Looks like the given store is currently closed.");
+      .send('Looks like the given store is currently closed.');
 
   let orderItemsTotal = 0;
   const orderItems = req.body.order_items.map((item) => {
@@ -61,28 +61,28 @@ const createOrder = async (req, res) => {
   });
 
   if (req.body.couponCode && !coupon)
-    return res.status(404).send("Looks like the coupon used cannot be found.");
+    return res.status(404).send('Looks like the coupon used cannot be found.');
 
   if (coupon) {
     if (!coupon.active)
       return res
         .status(400)
         .send(
-          "The coupon provided is currently deactivated and cannot be used."
+          'The coupon provided is currently deactivated and cannot be used.'
         );
 
     if (new Date(coupon.expiresAt).getTime() < Date.now())
-      return res.status(400).send("The coupon used is expired.");
+      return res.status(400).send('The coupon used is expired.');
 
     if (coupon.usedBy.indexOf(req.customer._id) > -1)
       return res
         .status(400)
-        .send("Looks like the coupon has already been used.");
+        .send('Looks like the coupon has already been used.');
 
     if (coupon.usedBy.length >= coupon.limit)
       return res
         .status(400)
-        .send("Looks like the coupon has exceeded its maximum usage limit.");
+        .send('Looks like the coupon has exceeded its maximum usage limit.');
 
     order.total = Math.max.apply(null, [0, order.total - coupon.amount]);
     coupon.usedBy = [...coupon.usedBy, req.customer._id];
@@ -107,12 +107,12 @@ const getOrders = async (req, res) => {
   const orderId = req.query.orderId;
 
   const filter = {};
-  if (orderId) filter.orderId = new RegExp(orderId, "i");
+  if (orderId) filter.orderId = new RegExp(orderId, 'i');
 
   let [orders, ordersCount] = await Promise.all([
     Order.find(filter)
-      .populate("customer")
-      .populate("branch")
+      .populate('customer')
+      .populate('branch')
       .skip(currentPage)
       .limit(pageSize),
     Order.find().count(),
@@ -129,12 +129,12 @@ const getBranchOrders = async (req, res) => {
 
   const filter = {};
   if (branch) filter.branch = branch;
-  if (status) filter["status.value"] = parseInt(status);
+  if (status) filter['status.value'] = parseInt(status);
 
   let [orders, ordersCount] = await Promise.all([
     Order.find(filter)
-      .populate("customer")
-      .populate("branch")
+      .populate('customer')
+      .populate('branch')
       .skip(currentPage)
       .limit(pageSize),
     Order.find(filter).count(),
@@ -146,8 +146,17 @@ const getBranchOrders = async (req, res) => {
 const getShopperOrders = async (req, res) => {
   const orders = await Order.find({
     shopper: req.employee._id,
-    "status.value": 1,
-  }).select("-customer -comment");
+    'status.value': 1,
+  }).select('-customer -comment');
+
+  res.send(orders);
+};
+
+const getRiderOrders = async (req, res) => {
+  const orders = await Order.find({
+    rider: req.employee._id,
+    'status.value': 1,
+  }).select('-customer -comment');
 
   res.send(orders);
 };
@@ -158,7 +167,7 @@ const getBranchPendingOrders = async (req, res) => {
 
   const filter = {};
   if (branch) filter.branch = branch;
-  if (status) filter["status.value"] = status;
+  if (status) filter['status.value'] = status;
 
   let pendingOrders = await Promise.all([Order.find(filter).count()]);
 
@@ -167,13 +176,13 @@ const getBranchPendingOrders = async (req, res) => {
 
 const getOrder = async (req, res) => {
   let order = await Order.findById(req.params.id)
-    .populate("customer")
-    .populate("branch")
-    .populate("payment_method")
-    .populate("rider")
-    .populate("shopper");
+    .populate('customer')
+    .populate('branch')
+    .populate('payment_method')
+    .populate('rider')
+    .populate('shopper');
 
-  if (!order) return res.status(404).send("Order not found.");
+  if (!order) return res.status(404).send('Order not found.');
 
   res.send(order);
 };
@@ -187,14 +196,14 @@ const getCustomerOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   const order = await Order.findByIdAndUpdate(req.params.id, {
     $set: {
-      "status.updated_at": Date.now(),
+      'status.updated_at': Date.now(),
     },
     $inc: {
-      "status.value": 1,
+      'status.value': 1,
     },
   });
 
-  if (!order) return req.status(404).send("Order not found.");
+  if (!order) return req.status(404).send('Order not found.');
 
   res.send(order);
 };
@@ -204,23 +213,23 @@ const markAsDelivered = async (req, res) => {
     req.params.id,
     {
       $set: {
-        "status.updated_at": Date.now(),
-        "status.value": 3,
+        'status.updated_at': Date.now(),
+        'status.value': 3,
       },
     },
     { new: true }
   );
 
-  if (!order) return req.status(404).send("Order not found.");
+  if (!order) return req.status(404).send('Order not found.');
 
   res.send(order);
 };
 
 const updateOrderProcess = async (req, res) => {
   if (!req.body.shopperId)
-    return res.status(400).send("shopperId is required.");
+    return res.status(400).send('shopperId is required.');
 
-  if (!req.body.riderId) return res.status(400).send("riderId is required.");
+  if (!req.body.riderId) return res.status(400).send('riderId is required.');
 
   const [shopper, rider] = await Promise.all([
     User.findById(req.body.shopperId),
@@ -228,16 +237,16 @@ const updateOrderProcess = async (req, res) => {
   ]);
 
   if (!shopper)
-    return res.status(404).send("Looks like the shopper cannot be found.");
+    return res.status(404).send('Looks like the shopper cannot be found.');
   if (!rider)
-    return res.status(404).send("Looks like the rider cannot be found.");
+    return res.status(404).send('Looks like the rider cannot be found.');
 
   const order = await Order.findByIdAndUpdate(
     req.params.id,
     {
       $set: {
-        "status.value": 1,
-        "status.updated_at": Date.now(),
+        'status.value': 1,
+        'status.updated_at': Date.now(),
         shopper: shopper,
         rider: rider,
       },
@@ -246,11 +255,11 @@ const updateOrderProcess = async (req, res) => {
   );
 
   if (!order)
-    return res.status(404).send("Looks like the order cannot be found.");
+    return res.status(404).send('Looks like the order cannot be found.');
 
   const notification = new CustomerNotification({
     userId: order.customer,
-    title: "Digimart",
+    title: 'Digimart',
     text: `Your order is being processed. \nOrder Id: ${order.orderId}.`,
   });
 
@@ -281,7 +290,7 @@ const updateOrder = async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (!order)
-    return res.status(404).send("Looks like the order cannot be found.");
+    return res.status(404).send('Looks like the order cannot be found.');
 
   if (comment) order.comment = comment;
   if (delivered_at) order.delivered_at = delivered_at;
@@ -295,7 +304,7 @@ const updateOrder = async (req, res) => {
 
 const updateOnOpen = async (req, res) => {
   const order = await Order.findById(req.params.id);
-  if (!order) return res.status(404).send("Order not found.");
+  if (!order) return res.status(404).send('Order not found.');
 
   order.status.value = 1;
   order.status.update_at = Date.now();
@@ -306,7 +315,7 @@ const updateOnOpen = async (req, res) => {
 
 const dispatchOrder = async (req, res) => {
   const order = await Order.findById(req.params.id);
-  if (!order) return res.status(404).send("Order not found.");
+  if (!order) return res.status(404).send('Order not found.');
 
   order.color = req.body.color;
   order.status.value = 2;
@@ -326,11 +335,10 @@ const deleteOrder = async (req, res) => {
     await customer.save();
   }
 
-  if (!order) return res.status(404).send("Looks like order cannot be found.");
+  if (!order) return res.status(404).send('Looks like order cannot be found.');
 
   res.send(order);
 };
-
 
 const createOrderOnPayment = async (req, res) => {
   const { reference } = req.body;
@@ -353,9 +361,8 @@ const createOrderOnPayment = async (req, res) => {
 
   await orderPaymentInfo.remove();
 
-  res.send({ message: "Your order has been placed.", order });
-}
-
+  res.send({ message: 'Your order has been placed.', order });
+};
 
 module.exports = {
   createOrder,
@@ -372,5 +379,6 @@ module.exports = {
   deleteOrder,
   markAsDelivered,
   getShopperOrders,
+  getRiderOrders,
   createOrderOnPayment,
 };
