@@ -58,6 +58,13 @@ router.patch(
   [validateId, auth('mananger')],
   errorHandler(controller.markAsDelivered)
 );
+
+router.patch(
+  '/:id/mark_as_delivered/customer',
+  [validateId, customerAuth],
+  errorHandler(controller.markAsDelivered)
+);
+
 router.patch(
   '/:id',
   [validateId, auth('mananger')],
