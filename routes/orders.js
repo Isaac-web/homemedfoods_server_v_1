@@ -53,9 +53,16 @@ router.patch(
   [validateId, auth('mananger')],
   errorHandler(controller.updateOnOpen)
 );
+
 router.patch(
   '/:id/mark_as_delivered',
   [validateId, auth('mananger')],
+  errorHandler(controller.markAsDelivered)
+);
+
+router.patch(
+  '/:id/mark_as_delivered/rider',
+  [validateId, auth('rider')],
   errorHandler(controller.markAsDelivered)
 );
 
