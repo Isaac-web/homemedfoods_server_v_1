@@ -17,7 +17,7 @@ const reports = require('../routes/reports');
 const sliders = require('../routes/sliders');
 const uploads = require('../routes/upload');
 const notifications = require('../routes/notifications');
-const system = require('../routes/system');
+const versions = require('../routes/versions');
 const locations = require('../routes/locations');
 
 module.exports = (app) => {
@@ -43,7 +43,7 @@ module.exports = (app) => {
   app.use('/api/reports', reports);
   app.use('/api/sliders', sliders);
   app.use('/api/uploads', uploads);
-  app.use('/api/system', system);
   app.use('/api/cart', cart);
   app.use('/api/locations', locations);
+  app.use('/api/system', versions);
 };
