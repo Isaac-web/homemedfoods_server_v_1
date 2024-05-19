@@ -17,5 +17,9 @@
     "digimartRiderServerKey": "RIDER_FCM_SERVER_KEY",
     "digimartCustomerServerKey": "CUSTOMER_FCM_SERVER_KEY",
     "digimartDashboardServerKey": "DASHBOARD_FCM_SERVER_KEY"
+  },
+  "slack_api": {
+    "xoxb-token": "SLACK_XOXB_TOKEN",
+    "channelId": "SLACK_CHANNEL_ID"
   }
 }

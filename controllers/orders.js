@@ -11,6 +11,7 @@ const {
   getServerKey,
 } = require('../utils/pushNotification');
 const { OrderPayamentInfo } = require('../models/OrderPaymentInfo');
+const { notifySlackOnNewOrder } = require('../utils/slackBot');
 
 const createOrder = async (req, res) => {
   const { error } = validate(req.body);
@@ -97,6 +98,8 @@ const createOrder = async (req, res) => {
     : 1;
 
   await Promise.all([order.save(), req.customer.save()]);
+
+  await notifySlackOnNewOrder({order, customer: req.customer});
 
   res.send(order);
 };

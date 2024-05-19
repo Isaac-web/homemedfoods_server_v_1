@@ -24,6 +24,7 @@
   "homepage": "https://github.com/Isaac-web/homemedfoods_server_v_1#readme",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
+    "@slack/web-api": "^7.0.4",
     "aws-sdk": "^2.1304.0",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
