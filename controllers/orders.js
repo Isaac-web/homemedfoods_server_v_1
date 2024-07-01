@@ -99,7 +99,7 @@ const createOrder = async (req, res) => {
 
   await Promise.all([order.save(), req.customer.save()]);
 
-  await notifySlackOnNewOrder({order, customer: req.customer});
+  await notifySlackOnNewOrder({ order, customer: req.customer });
 
   res.send(order);
 };

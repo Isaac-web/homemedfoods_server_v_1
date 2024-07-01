@@ -19,7 +19,7 @@ const uploads = require('../routes/upload');
 const notifications = require('../routes/notifications');
 const versions = require('../routes/versions');
 const locations = require('../routes/locations');
-
+const delivery = require('../routes/delivery');
 module.exports = (app) => {
   app.get('/ping', (req, res) => {
     res.send('Pong');
@@ -28,6 +28,7 @@ module.exports = (app) => {
   app.use('/api/addresses', addresses);
   app.use('/api/branches', branches);
   app.use('/api/categories', productCategory);
+  app.use('/api/delivery', delivery);
   app.use('/api/designations', designations);
   app.use('/api/discounts', discounts);
   app.use('/api/orders', orders);
